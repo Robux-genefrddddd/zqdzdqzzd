@@ -12,12 +12,12 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-6 pr-4 ${!isUser ? "pl-0" : ""}`}>
       <div
-        className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg ${
+        className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-2xl leading-relaxed ${
           isUser
-            ? "bg-blue-500 text-white"
-            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
+            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-sm"
+            : "bg-white ring-1 ring-zinc-200/60 text-zinc-900 dark:bg-zinc-900 dark:ring-zinc-800 dark:text-zinc-100 shadow-sm"
         }`}
       >
         {isUser ? (
