@@ -31,9 +31,9 @@ interface ChatState {
 // Use OpenRouter if configured on server, otherwise use mock
 const chatProvider = createOpenRouterChatProvider();
 
-export const useChatStore = create<ChatState>((set, get) => {
-  let currentAbortSignal: AbortSignal | null = null;
+let currentAbortSignal: AbortSignal | null = null;
 
+export const useChatStore = create<ChatState>((set, get) => {
   return {
     // Initial state
     conversations: [],
