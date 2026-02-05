@@ -109,7 +109,7 @@ function ComposerComponent({ conversationId }: ComposerProps) {
           {isGenerating && (
             <div className="flex items-center gap-2 text-sm text-zinc-400 px-4">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              Assistant is typing...
+              <span>L'assistant compose sa réponse...</span>
             </div>
           )}
         </div>
