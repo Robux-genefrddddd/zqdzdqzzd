@@ -217,6 +217,26 @@ export const useChatStore = create<ChatState>((set, get) => {
           });
         }
 
+        // Flush remaining buffer if any
+        if (updateBuffer.length > 0) {
+          set((state) => {
+            const newMessages = new Map(state.messages);
+            const convMessages = newMessages.get(conversationId) || [];
+            const updatedMessages = [...convMessages];
+            const lastMsg = updatedMessages[updatedMessages.length - 1];
+
+            if (lastMsg && lastMsg.role === "assistant") {
+              updatedMessages[updatedMessages.length - 1] = {
+                ...lastMsg,
+                content: lastMsg.content + updateBuffer,
+              };
+            }
+
+            newMessages.set(conversationId, updatedMessages);
+            return { messages: newMessages };
+          });
+        }
+
         // Update conversation title if empty (first message)
         const conversations = get().conversations;
         const conversation = conversations.find((c) => c.id === conversationId);
