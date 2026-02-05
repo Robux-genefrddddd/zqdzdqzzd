@@ -126,6 +126,7 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
 export const MessageBubble = memo(MessageBubbleComponent, (prev, next) => {
   return (
     prev.message.id === next.message.id &&
-    prev.message.content === next.message.content
+    prev.message.content === next.message.content &&
+    prev.isComposing === next.isComposing
   );
 });
