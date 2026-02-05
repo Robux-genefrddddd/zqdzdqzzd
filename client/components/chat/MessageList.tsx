@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "@/store/useChatStore";
 import { MessageBubble } from "./MessageBubble";
 import { ChevronDown } from "lucide-react";
@@ -11,20 +11,16 @@ export function MessageList({ conversationId }: MessageListProps) {
   const messagesMap = useChatStore((s) => s.messages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const messageCountRef = useRef(0);
+  const previousCountRef = useRef<number>(0);
 
-  const messages = useMemo(
-    () => (conversationId ? messagesMap.get(conversationId) || [] : []),
-    [conversationId, messagesMap]
-  );
+  const messages = conversationId ? messagesMap.get(conversationId) || [] : [];
+  const currentCount = messages.length;
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    const newCount = messages.length;
-
-    // Only scroll if message count actually changed
-    if (newCount !== messageCountRef.current && newCount > 0) {
-      messageCountRef.current = newCount;
+    // Only scroll if count actually increased
+    if (currentCount > previousCountRef.current && currentCount > 0) {
+      previousCountRef.current = currentCount;
 
       // Use setTimeout to ensure DOM has updated
       setTimeout(() => {
@@ -33,8 +29,10 @@ export function MessageList({ conversationId }: MessageListProps) {
           setShowScrollButton(false);
         }
       }, 0);
+    } else {
+      previousCountRef.current = currentCount;
     }
-  }, [messages]);
+  }, [currentCount, conversationId]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
