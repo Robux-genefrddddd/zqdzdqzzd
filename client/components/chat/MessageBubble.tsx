@@ -71,8 +71,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         <p
           className={`text-xs mt-2 ${
             isUser
-              ? "text-zinc-200 dark:text-zinc-700"
-              : "text-zinc-500 dark:text-zinc-500"
+              ? "text-blue-100"
+              : "text-zinc-400"
           }`}
         >
           {new Date(message.createdAt).toLocaleTimeString([], {
