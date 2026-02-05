@@ -47,11 +47,11 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
             }
           }}
           autoFocus
-          className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-2 py-1 bg-zinc-900/40 border border-zinc-800/70 text-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
         <button
           onClick={handleRename}
-          className="px-2 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+          className="px-2 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 active:scale-[0.95] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
         >
           Save
         </button>
