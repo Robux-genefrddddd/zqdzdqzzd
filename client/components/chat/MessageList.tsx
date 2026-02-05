@@ -27,17 +27,14 @@ export function MessageList({ conversationId }: MessageListProps) {
   // Message count for scrolling
   const messageCount = messages.length;
 
-  // Smooth auto-scroll to bottom
+  // Smooth auto-scroll to bottom with debounce
   const scrollToBottom = () => {
     if (scrollRef.current) {
       const scrollContainer = scrollRef.current;
       const targetScroll = scrollContainer.scrollHeight;
 
-      // Smooth scroll instead of instant
-      scrollContainer.scrollTo({
-        top: targetScroll,
-        behavior: "smooth",
-      });
+      // Auto scroll without smooth behavior for performance
+      scrollContainer.scrollTop = targetScroll;
       setShowScrollButton(false);
     }
   };
