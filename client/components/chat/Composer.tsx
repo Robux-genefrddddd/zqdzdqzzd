@@ -25,7 +25,7 @@ function ComposerComponent({ conversationId }: ComposerProps) {
     }
   }, [input]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!conversationId || !input.trim() || isGenerating) {
@@ -37,14 +37,14 @@ function ComposerComponent({ conversationId }: ComposerProps) {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
-  };
+  }, [conversationId, input, isGenerating, sendMessage]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e as any);
     }
-  };
+  }, [handleSubmit]);
 
   // Listen for suggestion button clicks
   useEffect(() => {
