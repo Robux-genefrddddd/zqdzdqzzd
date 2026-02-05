@@ -56,19 +56,19 @@ export function Composer({ conversationId }: ComposerProps) {
   ];
 
   return (
-    <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 md:px-6 lg:px-8 py-6 space-y-4">
+    <div className="sticky bottom-0 border-t border-zinc-200/60 dark:border-zinc-800 bg-gradient-to-t from-zinc-50 via-zinc-50/95 to-transparent dark:from-zinc-950 dark:via-zinc-950/95 dark:to-transparent px-4 md:px-6 lg:px-8 py-6 space-y-4">
       {/* Empty state with quick prompts */}
       {conversationId && messages?.length === 0 && (
         <div className="max-w-3xl mx-auto">
           <h3 className="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-300">
-            Quick prompts
+            Try these prompts
           </h3>
           <div className="grid grid-cols-2 gap-2">
             {quickPrompts.map((prompt, i) => (
               <button
                 key={i}
                 onClick={() => setInput(prompt)}
-                className="p-3 text-left text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition"
+                className="p-3 text-left text-sm bg-white ring-1 ring-zinc-200/60 text-zinc-700 dark:text-zinc-300 dark:bg-zinc-900 dark:ring-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition"
               >
                 {prompt}
               </button>
@@ -89,7 +89,7 @@ export function Composer({ conversationId }: ComposerProps) {
               placeholder="Type a message... (Shift+Enter for new line)"
               disabled={isGenerating || !conversationId}
               rows={1}
-              className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed max-h-36"
+              className="w-full px-4 py-3 bg-white ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-600/60 dark:focus:ring-blue-500/60 disabled:opacity-50 disabled:cursor-not-allowed max-h-36 text-[15px] placeholder-zinc-500 dark:placeholder-zinc-400"
             />
           </div>
 
@@ -97,7 +97,7 @@ export function Composer({ conversationId }: ComposerProps) {
             <button
               type="button"
               onClick={stopGenerating}
-              className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center gap-2"
+              className="p-3 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition flex items-center gap-2 shadow-sm"
               aria-label="Stop generating"
             >
               <Square className="w-5 h-5 fill-current" />
@@ -106,7 +106,7 @@ export function Composer({ conversationId }: ComposerProps) {
             <button
               type="submit"
               disabled={!input.trim() || !conversationId}
-              className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm font-medium"
               aria-label="Send message"
             >
               <Send className="w-5 h-5" />
