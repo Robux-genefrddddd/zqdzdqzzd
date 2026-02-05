@@ -118,6 +118,10 @@ export const useChatStore = create<ChatState>((set, get) => {
       set({ showMobileSidebar: show });
     },
 
+    setIsSearching: (searching: boolean) => {
+      set({ isSearching: searching });
+    },
+
     sendMessage: async (conversationId: string, content: string) => {
       const state = get();
       if (!state.messages.has(conversationId)) {
