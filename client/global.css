@@ -109,8 +109,9 @@
   }
 
   .prose pre {
-    @apply max-h-96 overflow-y-auto overscroll-contain;
+    @apply max-h-80 overflow-y-auto overscroll-contain;
     contain: layout style paint;
+    transform: translateZ(0); /* Enable GPU acceleration */
   }
 
   /* Reduce repaints during streaming */
