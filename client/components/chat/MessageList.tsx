@@ -15,7 +15,6 @@ export function MessageList({ conversationId }: MessageListProps) {
   const scrollEventTimeoutRef = useRef<NodeJS.Timeout>();
 
   const isGenerating = useChatStore((s) => s.isGenerating);
-  const isSearching = useChatStore((s) => s.isSearching);
 
   // Get the actual messages array
   const allMessages = useChatStore((s) =>
