@@ -20,8 +20,18 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">
-          {children}
+        <div className="relative flex flex-col overflow-hidden bg-zinc-950">
+          {/* Background with radial highlight */}
+          <div className="pointer-events-none absolute inset-0">
+            {/* Radial gradient highlight */}
+            <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_-20%,rgba(255,255,255,0.08),transparent_60%)]" />
+            {/* Micro noise overlay */}
+            <div className="absolute inset-0 opacity-[0.035] [background-image:radial-gradient(rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:3px_3px]" />
+          </div>
+          {/* Content */}
+          <div className="relative flex flex-col h-full overflow-hidden">
+            {children}
+          </div>
         </div>
       </div>
 
