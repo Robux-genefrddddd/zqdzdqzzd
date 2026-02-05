@@ -167,7 +167,7 @@ export const useChatStore = create<ChatState>((set, get) => {
           // Buffer chunks for performance - batch updates
           updateBuffer += chunk.chunk;
           const now = Date.now();
-          const shouldUpdate = now - lastUpdateTime > 50 || chunk.isComplete; // Update every 50ms max
+          const shouldUpdate = now - lastUpdateTime > 150 || chunk.isComplete; // Update every 150ms max to avoid crash
 
           if (!shouldUpdate && updateBuffer.length < 500) {
             continue; // Skip update, buffer more chunks
