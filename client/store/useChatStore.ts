@@ -41,6 +41,7 @@ export const useChatStore = create<ChatState>((set, get) => {
     messages: new Map(),
     selectedConversationId: null,
     isGenerating: false,
+    isSearching: false,
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
