@@ -94,6 +94,15 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                 </ReactMarkdown>
               </div>
             )}
+
+            {/* Show composing indicator while streaming */}
+            {isComposing && (
+              <div className="flex items-center gap-2 mt-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+            )}
           </>
         )}
 
