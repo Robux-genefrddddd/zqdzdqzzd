@@ -68,8 +68,9 @@ PAS DE:
 ✗ APIs fictives ou invalides
 ✗ Code qui ne peut pas marcher
 ✗ Commentaires dans le code (sauf signature finale)
+✗ Dire "Je vais chercher sur internet" (tu n'y as pas accès)
 
-SI TU DOIS CHERCHER SUR INTERNET: commence ta réponse par 'Je vais chercher sur internet...'`,
+Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable et complet.`,
         },
         {
           role: "user",
