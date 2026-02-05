@@ -48,7 +48,7 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                   const codeContent = String(children).replace(/\n$/, "");
 
                   // Check if this is a code block (not inline)
-                  const isCodeBlock = !inline && (match || className === "" || !className);
+                  const isCodeBlock = !inline;
 
                   return isCodeBlock ? (
                     <div className="relative rounded-lg my-2 group max-h-96 overflow-hidden">
