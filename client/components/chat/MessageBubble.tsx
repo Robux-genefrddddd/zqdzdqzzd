@@ -42,9 +42,14 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                   remarkPlugins={[remarkGfm]}
                   components={{
                 code({ node, inline, className, children, ...props }: any) {
-                  // Extract language from className (e.g., "language-lua" -> "lua")
-                  const match = /language-(\w+)/.exec(className || "");
-                  const language = match ? match[1] : "lua"; // Default to Lua for Roblox
+                  // Extract language from className (e.g., "language-lua" or "lang-lua" -> "lua")
+                  let language = "lua"; // Default to Lua for Roblox
+                  if (className) {
+                    const langMatch = className.match(/(?:language|lang)-(\w+)/);
+                    if (langMatch) {
+                      language = langMatch[1];
+                    }
+                  }
                   const codeContent = String(children).replace(/\n$/, "");
 
                   // Check if this is a code block (not inline)
