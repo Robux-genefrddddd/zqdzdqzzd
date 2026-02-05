@@ -28,7 +28,8 @@ interface ChatState {
   stopGenerating: () => void;
 }
 
-const chatProvider = createMockChatProvider();
+// Use OpenRouter if configured on server, otherwise use mock
+const chatProvider = createOpenRouterChatProvider();
 
 export const useChatStore = create<ChatState>((set, get) => {
   let currentAbortSignal: AbortSignal | null = null;
