@@ -29,20 +29,6 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="border-t border-zinc-200/60 dark:border-zinc-800 p-4 space-y-2">
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition"
-          aria-label="Toggle dark mode"
-        >
-          <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-          {darkMode ? (
-            <Sun className="w-4 h-4" />
-          ) : (
-            <Moon className="w-4 h-4" />
-          )}
-        </button>
-
         {/* Settings */}
         <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition">
           <span>Settings</span>
