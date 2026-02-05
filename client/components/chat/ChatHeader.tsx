@@ -77,13 +77,13 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-10">
+              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-xl shadow-md z-10 overflow-hidden">
                 <button
                   onClick={() => {
                     setNewTitle(conversation.title);
                     setIsRenaming(true);
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition text-left"
                 >
                   <Edit2 className="w-4 h-4" />
                   Rename
@@ -95,7 +95,7 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
                     );
                     setShowMenu(false);
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition text-left"
                 >
                   <Copy className="w-4 h-4" />
                   Share
