@@ -47,11 +47,11 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
             }
           }}
           autoFocus
-          className="flex-1 px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleRename}
-          className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition"
+          className="px-2 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
         >
           Save
         </button>
@@ -61,10 +61,10 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
 
   return (
     <div
-      className={`group relative px-3 py-2 rounded-lg cursor-pointer transition ${
+      className={`group relative px-3 py-2 rounded-xl cursor-pointer transition ${
         isSelected
-          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100"
-          : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          ? "bg-blue-500/10 dark:bg-blue-500/10 text-blue-900 dark:text-blue-200 ring-1 ring-blue-200/30 dark:ring-blue-500/30"
+          : "hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60"
       }`}
       onClick={() => selectConversation(conversation.id)}
     >
