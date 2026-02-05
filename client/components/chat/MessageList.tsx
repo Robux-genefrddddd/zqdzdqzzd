@@ -123,9 +123,9 @@ export function MessageList({ conversationId }: MessageListProps) {
               <MessageBubble key={message.id} message={message} />
             ))}
 
-            {/* Show thinking indicator while generating - appears before assistant response */}
-            {isGenerating && (
-              <div key="thinking">
+            {/* Show search indicator only when searching */}
+            {isSearching && (
+              <div key="searching">
                 <ThinkingIndicator />
               </div>
             )}
