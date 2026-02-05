@@ -3,13 +3,15 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { MessageList } from "@/components/chat/MessageList";
 import { Composer } from "@/components/chat/Composer";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Index() {
   const selectedConversationId = useChatStore((s) => s.selectedConversationId);
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const darkMode = useChatStore((s) => s.darkMode);
+
+  const hasInitialized = useRef(false);
 
   // Initialize app theme
   useEffect(() => {
@@ -20,7 +22,8 @@ export default function Index() {
 
   // Create first conversation on mount if none exist
   useEffect(() => {
-    if (conversations.length === 0) {
+    if (!hasInitialized.current && conversations.length === 0) {
+      hasInitialized.current = true;
       createConversation();
     }
   }, []);

@@ -8,41 +8,93 @@ interface MessageListProps {
 }
 
 export function MessageList({ conversationId }: MessageListProps) {
-  const messagesMap = useChatStore((s) => s.messages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollEventTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const messages = conversationId ? messagesMap.get(conversationId) || [] : [];
+  const isGenerating = useChatStore((s) => s.isGenerating);
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      setShowScrollButton(false);
-    }
-  }, [messages]);
+  // Get the actual messages array
+  const allMessages = useChatStore((s) =>
+    conversationId ? s.messages.get(conversationId) || [] : [],
+  );
 
-  const handleScroll = () => {
-    if (scrollRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-      setShowScrollButton(!isAtBottom);
-    }
-  };
+  // Messages displayed (no filtering of empty assistant message anymore)
+  const messages = allMessages;
 
+  // Message count for scrolling
+  const messageCount = messages.length;
+
+  // Smooth auto-scroll to bottom with debounce
   const scrollToBottom = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const scrollContainer = scrollRef.current;
+      const targetScroll = scrollContainer.scrollHeight;
+
+      // Auto scroll without smooth behavior for performance
+      scrollContainer.scrollTop = targetScroll;
       setShowScrollButton(false);
     }
   };
+
+  // Auto-scroll when messages change or AI is generating
+  useEffect(() => {
+    // Clear any pending scroll timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    // Only scroll during generation, not constantly
+    if (isGenerating) {
+      // Debounce scroll updates to avoid constant reflows
+      scrollTimeoutRef.current = setTimeout(() => {
+        scrollToBottom();
+      }, 150); // Debounce to avoid crash
+    } else if (messageCount > 0) {
+      // Scroll immediately when generation ends
+      scrollToBottom();
+    }
+
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [messageCount, isGenerating]);
+
+  const handleScroll = () => {
+    // Debounce scroll detection to avoid constant state updates
+    if (scrollEventTimeoutRef.current) {
+      clearTimeout(scrollEventTimeoutRef.current);
+    }
+
+    scrollEventTimeoutRef.current = setTimeout(() => {
+      if (scrollRef.current && !isGenerating) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+        setShowScrollButton(!isAtBottom);
+      }
+    }, 200); // Debounce scroll detection
+  };
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (scrollEventTimeoutRef.current) {
+        clearTimeout(scrollEventTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!conversationId) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2">Start a conversation</h2>
-          <p className="text-zinc-500 dark:text-zinc-400">
+      <div className="flex-1 flex items-center justify-center px-4">
+        <div className="mx-auto rounded-2xl bg-zinc-900/40 p-8 ring-1 ring-zinc-800/70 backdrop-blur text-center max-w-md">
+          <h2 className="text-2xl font-semibold mb-2 text-zinc-100">
+            Start a conversation
+          </h2>
+          <p className="text-sm text-zinc-400">
             Select a conversation from the sidebar or create a new one
           </p>
         </div>
@@ -51,7 +103,7 @@ export function MessageList({ conversationId }: MessageListProps) {
   }
 
   return (
-    <div className="flex-1 relative flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50/50 to-zinc-100/50 dark:from-zinc-950/50 dark:to-zinc-900/50">
+    <div className="flex-1 relative flex flex-col overflow-hidden">
       {/* Messages Container */}
       <div
         ref={scrollRef}
@@ -60,19 +112,50 @@ export function MessageList({ conversationId }: MessageListProps) {
       >
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2 text-zinc-900 dark:text-zinc-100">
+            <div className="mx-auto mt-24 max-w-md rounded-2xl bg-zinc-900/40 p-6 ring-1 ring-zinc-800/70 backdrop-blur">
+              <div className="text-base font-semibold text-zinc-100">
                 Start chatting
-              </h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              </div>
+              <div className="mt-1 text-sm text-zinc-400">
                 Send your first message below to begin
-              </p>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {[
+                  "Explain quantum computing",
+                  "Write a short story",
+                  "How do I learn TypeScript?",
+                  "What's the weather like?",
+                ].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      // Trigger composer focus and set input
+                      const event = new CustomEvent("setComposerInput", {
+                        detail: t,
+                      });
+                      window.dispatchEvent(event);
+                    }}
+                    className="rounded-xl bg-zinc-950/40 px-3 py-2 text-sm text-zinc-200 ring-1 ring-zinc-800/70 hover:bg-zinc-900/50 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto w-full">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
+          <div className="mx-auto flex h-full w-full max-w-3xl flex-col">
+            {messages.map((message, idx) => (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                isComposing={
+                  isGenerating &&
+                  idx === messages.length - 1 &&
+                  message.role === "assistant"
+                }
+              />
             ))}
           </div>
         )}

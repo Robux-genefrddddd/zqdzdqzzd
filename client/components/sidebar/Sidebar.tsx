@@ -8,13 +8,13 @@ export function Sidebar() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-zinc-200/60 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-          ChatGPT-like
+      <div className="p-4 border-b border-zinc-800/70">
+        <h2 className="text-sm font-semibold text-zinc-100 mb-4">
+          PinPin-IA 5.1
         </h2>
         <button
           onClick={createConversation}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-700 transition font-medium text-sm"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-900/40 border border-zinc-800/70 text-zinc-200 rounded-xl hover:bg-zinc-900/60 active:scale-[0.98] transition-all font-medium text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
           aria-label="Create new conversation"
         >
           <Plus className="w-4 h-4" />
@@ -28,21 +28,21 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-zinc-200/60 dark:border-zinc-800 p-4 space-y-2">
+      <div className="border-t border-zinc-800/70 p-4 space-y-2">
         {/* Settings */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/40 active:scale-[0.98] rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40">
           <span>Settings</span>
           <Settings className="w-4 h-4" />
         </button>
 
         {/* Account */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/40 active:scale-[0.98] rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40">
           <span>Account</span>
           <User className="w-4 h-4" />
         </button>
 
         {/* Logout */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-red-400 hover:bg-red-950/30 active:scale-[0.98] rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40">
           <span>Logout</span>
           <LogOut className="w-4 h-4" />
         </button>

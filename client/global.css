@@ -96,4 +96,49 @@
     overflow-x: auto;
     white-space: pre;
   }
+
+  /* Optimize scrolling performance */
+  .scroll-smooth {
+    scroll-behavior: auto;
+    will-change: scroll-position;
+    contain: layout style;
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  /* Optimize message rendering */
+  .prose {
+    @apply max-w-none;
+  }
+
+  .prose pre {
+    @apply max-h-80 overflow-y-auto overscroll-contain;
+    contain: layout style paint;
+    transform: translateZ(0); /* Enable GPU acceleration */
+  }
+
+  /* Reduce repaints during streaming */
+  [data-testid="message-bubble"] {
+    contain: layout style paint;
+  }
+
+  /* Optimize code blocks */
+  pre code {
+    @apply block;
+  }
+
+  /* Performance: use will-change sparingly */
+  .prose p,
+  .prose li {
+    @apply text-zinc-100;
+  }
+
+  /* Reduce animations on low-power devices */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

@@ -47,11 +47,11 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
             }
           }}
           autoFocus
-          className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-2 py-1 bg-zinc-900/40 border border-zinc-800/70 text-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
         <button
           onClick={handleRename}
-          className="px-2 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+          className="px-2 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 active:scale-[0.95] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
         >
           Save
         </button>
@@ -61,17 +61,19 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
 
   return (
     <div
-      className={`group relative px-3 py-2 rounded-xl cursor-pointer transition ${
+      className={`group relative px-3 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] ${
         isSelected
-          ? "bg-blue-500/10 dark:bg-blue-500/10 text-blue-900 dark:text-blue-200 ring-1 ring-blue-200/30 dark:ring-blue-500/30"
-          : "hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60"
+          ? "bg-zinc-900/30 text-zinc-100 ring-1 ring-blue-500/20 hover:bg-zinc-900/50"
+          : "text-zinc-300 hover:bg-zinc-800/40 ring-1 ring-transparent hover:ring-zinc-800/70"
       }`}
       onClick={() => selectConversation(conversation.id)}
     >
       <div className="flex items-start gap-3 justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{conversation.title}</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p
+            className={`text-xs ${isSelected ? "text-zinc-400" : "text-zinc-500"}`}
+          >
             {new Date(conversation.updatedAt).toLocaleDateString()}
           </p>
         </div>
@@ -83,7 +85,7 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
-            className="p-1 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition"
+            className="p-1 opacity-0 group-hover:opacity-100 hover:bg-zinc-700/60 active:scale-[0.95] rounded transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             aria-label="More options"
           >
             <MoreVertical className="w-4 h-4" />
@@ -91,14 +93,14 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
 
           {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-xl shadow-md z-10 min-w-max overflow-hidden">
+            <div className="absolute right-0 top-full mt-1 bg-zinc-900/80 border border-zinc-800/70 rounded-xl shadow-lg z-10 min-w-max overflow-hidden backdrop-blur ring-1 ring-zinc-700/30">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsRenaming(true);
                   setShowMenu(false);
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition text-left"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 active:scale-[0.98] transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
               >
                 <Edit2 className="w-4 h-4" />
                 Rename
@@ -108,7 +110,7 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
                   e.stopPropagation();
                   handleDelete();
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition text-left"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/40 active:scale-[0.98] transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete

@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { Conversation, Message } from "@/types/index";
-import { createMockChatProvider } from "@/providers/chatProvider";
+import {
+  createMockChatProvider,
+  createOpenRouterChatProvider,
+} from "@/providers/chatProvider";
 
 interface ChatState {
   // Data
@@ -10,6 +13,7 @@ interface ChatState {
 
   // UI State
   isGenerating: boolean;
+  isSearching: boolean;
   searchQuery: string;
   darkMode: boolean;
   showMobileSidebar: boolean;
@@ -22,23 +26,26 @@ interface ChatState {
   setSearchQuery: (query: string) => void;
   toggleDarkMode: () => void;
   setShowMobileSidebar: (show: boolean) => void;
+  setIsSearching: (searching: boolean) => void;
 
   // Chat actions
   sendMessage: (conversationId: string, content: string) => Promise<void>;
   stopGenerating: () => void;
 }
 
-const chatProvider = createMockChatProvider();
+// Use OpenRouter if configured on server, otherwise use mock
+const chatProvider = createOpenRouterChatProvider();
+
+let currentAbortSignal: AbortSignal | null = null;
 
 export const useChatStore = create<ChatState>((set, get) => {
-  let currentAbortSignal: AbortSignal | null = null;
-
   return {
     // Initial state
     conversations: [],
     messages: new Map(),
     selectedConversationId: null,
     isGenerating: false,
+    isSearching: false,
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
@@ -115,6 +122,10 @@ export const useChatStore = create<ChatState>((set, get) => {
       set({ showMobileSidebar: show });
     },
 
+    setIsSearching: (searching: boolean) => {
+      set({ isSearching: searching });
+    },
+
     sendMessage: async (conversationId: string, content: string) => {
       const state = get();
       if (!state.messages.has(conversationId)) {
@@ -136,24 +147,6 @@ export const useChatStore = create<ChatState>((set, get) => {
           ...((newMessages.get(conversationId) as Message[]) || []),
           userMessage,
         ]);
-        return { messages: newMessages };
-      });
-
-      // Create empty assistant message for streaming
-      const assistantMessage: Message = {
-        id: `msg-${Date.now() + 1}`,
-        conversationId,
-        role: "assistant",
-        content: "",
-        createdAt: Date.now(),
-      };
-
-      set((state) => {
-        const newMessages = new Map(state.messages);
-        newMessages.set(conversationId, [
-          ...((newMessages.get(conversationId) as Message[]) || []),
-          assistantMessage,
-        ]);
         return { messages: newMessages, isGenerating: true };
       });
 
@@ -164,12 +157,63 @@ export const useChatStore = create<ChatState>((set, get) => {
       try {
         // Stream response from provider
         const generator = chatProvider.sendMessage(conversationId, content);
+        let assistantMessageCreated = false;
+        let updateBuffer = "";
+        let lastUpdateTime = Date.now();
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
             break;
           }
 
+          // Buffer chunks for performance - batch updates
+          updateBuffer += chunk.chunk;
+          const now = Date.now();
+          const shouldUpdate = now - lastUpdateTime > 150 || chunk.isComplete; // Update every 150ms max to avoid crash
+
+          if (!shouldUpdate && updateBuffer.length < 1000) {
+            continue; // Skip update, buffer more chunks (up to 1000 chars)
+          }
+
+          const chunkToProcess = updateBuffer;
+          updateBuffer = "";
+          lastUpdateTime = now;
+
+          set((state) => {
+            const newMessages = new Map(state.messages);
+            const convMessages = newMessages.get(conversationId) || [];
+            const updatedMessages = [...convMessages];
+
+            // Create assistant message on first chunk
+            if (!assistantMessageCreated && chunkToProcess) {
+              assistantMessageCreated = true;
+              const assistantMessage: Message = {
+                id: `msg-${Date.now() + 1}`,
+                conversationId,
+                role: "assistant",
+                content: chunkToProcess,
+                createdAt: Date.now(),
+              };
+              updatedMessages.push(assistantMessage);
+            } else {
+              // Update existing assistant message
+              const lastMsg = updatedMessages[updatedMessages.length - 1];
+              if (lastMsg && lastMsg.role === "assistant") {
+                const newContent = lastMsg.content + chunkToProcess;
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...lastMsg,
+                  content: newContent,
+                };
+              }
+            }
+
+            newMessages.set(conversationId, updatedMessages);
+            return { messages: newMessages };
+          });
+        }
+
+        // Flush remaining buffer if any
+        if (updateBuffer.length > 0) {
           set((state) => {
             const newMessages = new Map(state.messages);
             const convMessages = newMessages.get(conversationId) || [];
@@ -179,7 +223,7 @@ export const useChatStore = create<ChatState>((set, get) => {
             if (lastMsg && lastMsg.role === "assistant") {
               updatedMessages[updatedMessages.length - 1] = {
                 ...lastMsg,
-                content: lastMsg.content + chunk.chunk,
+                content: lastMsg.content + updateBuffer,
               };
             }
 
