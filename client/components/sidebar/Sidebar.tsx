@@ -1,0 +1,68 @@
+import { useChatStore } from "@/store/useChatStore";
+import { ConversationList } from "./ConversationList";
+import { Plus, Moon, Sun, LogOut, User, Settings } from "lucide-react";
+
+export function Sidebar() {
+  const createConversation = useChatStore((s) => s.createConversation);
+  const darkMode = useChatStore((s) => s.darkMode);
+  const toggleDarkMode = useChatStore((s) => s.toggleDarkMode);
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">
+          ChatGPT-like
+        </h2>
+        <button
+          onClick={createConversation}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition"
+          aria-label="Create new conversation"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="text-sm font-medium">New Chat</span>
+        </button>
+      </div>
+
+      {/* Search and Conversations */}
+      <div className="flex-1 overflow-y-auto">
+        <ConversationList />
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 space-y-2">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition"
+          aria-label="Toggle dark mode"
+        >
+          <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+          {darkMode ? (
+            <Sun className="w-4 h-4" />
+          ) : (
+            <Moon className="w-4 h-4" />
+          )}
+        </button>
+
+        {/* Settings */}
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition">
+          <span>Settings</span>
+          <Settings className="w-4 h-4" />
+        </button>
+
+        {/* Account */}
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition">
+          <span>Account</span>
+          <User className="w-4 h-4" />
+        </button>
+
+        {/* Logout */}
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition">
+          <span>Logout</span>
+          <LogOut className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
