@@ -109,3 +109,11 @@ function MessageBubbleComponent({ message }: MessageBubbleProps) {
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const MessageBubble = memo(MessageBubbleComponent, (prev, next) => {
+  return (
+    prev.message.id === next.message.id &&
+    prev.message.content === next.message.content
+  );
+});
