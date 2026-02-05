@@ -143,13 +143,6 @@ export function MessageList({ conversationId }: MessageListProps) {
                 isComposing={isGenerating && idx === messages.length - 1 && message.role === "assistant"}
               />
             ))}
-
-            {/* Show search indicator only when searching */}
-            {isSearching && (
-              <div key="searching">
-                <ThinkingIndicator />
-              </div>
-            )}
           </div>
         )}
       </div>
