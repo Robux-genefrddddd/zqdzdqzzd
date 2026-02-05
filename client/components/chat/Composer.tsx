@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo, useCallback } from "react";
 import { useChatStore } from "@/store/useChatStore";
 import { Send, Square } from "lucide-react";
 
@@ -6,7 +6,7 @@ interface ComposerProps {
   conversationId: string | null;
 }
 
-export function Composer({ conversationId }: ComposerProps) {
+function ComposerComponent({ conversationId }: ComposerProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
