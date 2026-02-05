@@ -119,8 +119,12 @@ export function MessageList({ conversationId }: MessageListProps) {
           </div>
         ) : (
           <div className="mx-auto flex h-full w-full max-w-3xl flex-col">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
+            {messages.map((message, idx) => (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                isComposing={isGenerating && idx === messages.length - 1 && message.role === "assistant"}
+              />
             ))}
 
             {/* Show search indicator only when searching */}
