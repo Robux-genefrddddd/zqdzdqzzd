@@ -172,6 +172,7 @@ export const useChatStore = create<ChatState>((set, get) => {
       try {
         // Stream response from provider
         const generator = chatProvider.sendMessage(conversationId, content);
+        let hasDetectedSearch = false;
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
@@ -185,13 +186,19 @@ export const useChatStore = create<ChatState>((set, get) => {
             const lastMsg = updatedMessages[updatedMessages.length - 1];
 
             if (lastMsg && lastMsg.role === "assistant") {
+              const newContent = lastMsg.content + chunk.chunk;
               updatedMessages[updatedMessages.length - 1] = {
                 ...lastMsg,
-                content: lastMsg.content + chunk.chunk,
+                content: newContent,
               };
+
+              // Detect if AI is searching on internet
+              if (!hasDetectedSearch && newContent.toLowerCase().includes("cherche sur internet")) {
+                hasDetectedSearch = true;
+                return { messages: newMessages, isSearching: true };
+              }
             }
 
-            newMessages.set(conversationId, updatedMessages);
             return { messages: newMessages };
           });
         }
