@@ -10,17 +10,17 @@ export function Sidebar() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">
+      <div className="p-4 border-b border-zinc-200/60 dark:border-zinc-800">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
           ChatGPT-like
         </h2>
         <button
           onClick={createConversation}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-700 transition font-medium text-sm"
           aria-label="Create new conversation"
         >
           <Plus className="w-4 h-4" />
-          <span className="text-sm font-medium">New Chat</span>
+          <span>New Chat</span>
         </button>
       </div>
 
@@ -30,7 +30,7 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 space-y-2">
+      <div className="border-t border-zinc-200/60 dark:border-zinc-800 p-4 space-y-2">
         {/* Theme Toggle */}
         <button
           onClick={toggleDarkMode}
