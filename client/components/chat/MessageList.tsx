@@ -12,6 +12,7 @@ export function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollEventTimeoutRef = useRef<NodeJS.Timeout>();
 
   const isGenerating = useChatStore((s) => s.isGenerating);
   const isSearching = useChatStore((s) => s.isSearching);
