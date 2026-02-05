@@ -48,16 +48,16 @@ export function Composer({ conversationId }: ComposerProps) {
 
   // Listen for suggestion button clicks
   useEffect(() => {
-    const handleSetInput = (e: CustomEvent) => {
+    const handleSetInput = (e: any) => {
       setInput(e.detail);
       setTimeout(() => {
         textareaRef.current?.focus();
       }, 0);
     };
 
-    window.addEventListener('setComposerInput', handleSetInput as EventListener);
-    return () => window.removeEventListener('setComposerInput', handleSetInput as EventListener);
-  }, [setInput]);
+    window.addEventListener('setComposerInput', handleSetInput);
+    return () => window.removeEventListener('setComposerInput', handleSetInput);
+  }, []);
 
   return (
     <div className="sticky bottom-0 z-10">
