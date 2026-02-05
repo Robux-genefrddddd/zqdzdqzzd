@@ -8,12 +8,15 @@ interface MessageListProps {
 }
 
 export function MessageList({ conversationId }: MessageListProps) {
-  const messagesMap = useChatStore((s) => s.messages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const previousCountRef = useRef<number>(0);
 
-  const messages = conversationId ? messagesMap.get(conversationId) || [] : [];
+  // Select messages for specific conversation
+  const messages = useChatStore((s) =>
+    conversationId ? s.messages.get(conversationId) || [] : []
+  );
+
   const currentCount = messages.length;
 
   // Auto-scroll to bottom when new messages arrive
@@ -32,7 +35,7 @@ export function MessageList({ conversationId }: MessageListProps) {
     } else {
       previousCountRef.current = currentCount;
     }
-  }, [currentCount, conversationId]);
+  }, [currentCount]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
