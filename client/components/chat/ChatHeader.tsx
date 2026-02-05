@@ -90,9 +90,7 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
                 </button>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${window.location.href}`
-                    );
+                    navigator.clipboard.writeText(`${window.location.href}`);
                     setShowMenu(false);
                   }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition text-left"

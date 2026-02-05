@@ -12,7 +12,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-6 pr-4 ${!isUser ? "pl-0" : ""}`}>
+    <div
+      className={`flex ${isUser ? "justify-end" : "justify-start"} mb-6 pr-4 ${!isUser ? "pl-0" : ""}`}
+    >
       <div
         className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-2xl leading-relaxed ${
           isUser

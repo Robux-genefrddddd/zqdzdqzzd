@@ -6,7 +6,7 @@ import { ChatStreamChunk } from "@/types/index";
  */
 const mockResponses = [
   "That's an interesting question! Let me think about that...\n\nHere's what I think:\n\n1. **First point**: This is a key aspect\n2. **Second point**: This is also important\n\n```javascript\n// Example code\nconst example = () => {\n  return 'Hello, World!';\n};\n```\n\nThe important thing to remember is that context matters. Feel free to ask follow-up questions!",
-  "Great question! I'd be happy to help.\n\n**Summary:**\n- Point A: Details here\n- Point B: More details\n\nLet me explain further with an example:\n\n```python\ndef example():\n    return \"This is a Python example\"\n```\n\nDoes this make sense? Would you like me to elaborate?",
+  'Great question! I\'d be happy to help.\n\n**Summary:**\n- Point A: Details here\n- Point B: More details\n\nLet me explain further with an example:\n\n```python\ndef example():\n    return "This is a Python example"\n```\n\nDoes this make sense? Would you like me to elaborate?',
   "I see what you're asking. Here's my perspective:\n\nThe answer depends on several factors:\n\n1. Context and situation\n2. Your specific needs\n3. Available resources\n\n```typescript\ninterface Example {\n  id: string;\n  title: string;\n}\n```\n\nFeel free to ask if you need clarification!",
 ];
 
@@ -17,7 +17,7 @@ const mockResponses = [
 export interface ChatProvider {
   sendMessage(
     conversationId: string,
-    userMessage: string
+    userMessage: string,
   ): AsyncGenerator<ChatStreamChunk>;
 }
 
@@ -29,7 +29,7 @@ export const createMockChatProvider = (): ChatProvider => {
   return {
     async *sendMessage(
       conversationId: string,
-      userMessage: string
+      userMessage: string,
     ): AsyncGenerator<ChatStreamChunk> {
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 800));

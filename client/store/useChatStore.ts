@@ -64,9 +64,7 @@ export const useChatStore = create<ChatState>((set, get) => {
 
     deleteConversation: (id: string) => {
       set((state) => {
-        const newConversations = state.conversations.filter(
-          (c) => c.id !== id
-        );
+        const newConversations = state.conversations.filter((c) => c.id !== id);
         const newMessages = new Map(state.messages);
         newMessages.delete(id);
 
@@ -74,7 +72,9 @@ export const useChatStore = create<ChatState>((set, get) => {
           conversations: newConversations,
           messages: newMessages,
           selectedConversationId:
-            state.selectedConversationId === id ? null : state.selectedConversationId,
+            state.selectedConversationId === id
+              ? null
+              : state.selectedConversationId,
         };
       });
     },
@@ -82,7 +82,7 @@ export const useChatStore = create<ChatState>((set, get) => {
     renameConversation: (id: string, title: string) => {
       set((state) => ({
         conversations: state.conversations.map((c) =>
-          c.id === id ? { ...c, title, updatedAt: Date.now() } : c
+          c.id === id ? { ...c, title, updatedAt: Date.now() } : c,
         ),
       }));
     },

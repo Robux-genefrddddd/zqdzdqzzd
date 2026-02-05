@@ -20,7 +20,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">{children}</div>
+        <div className="flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">
+          {children}
+        </div>
       </div>
 
       {/* Mobile Layout */}
@@ -55,7 +57,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">{children}</div>
+        <div className="flex-1 overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">
+          {children}
+        </div>
       </div>
     </div>
   );

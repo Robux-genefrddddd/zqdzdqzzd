@@ -9,7 +9,7 @@ export function ConversationList() {
 
   // Filter conversations by search query
   const filteredConversations = conversations.filter((conv) =>
-    conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Group conversations by date
@@ -18,15 +18,17 @@ export function ConversationList() {
   const sevenDaysMs = 7 * oneDayMs;
 
   const today = filteredConversations.filter(
-    (c) => now - c.updatedAt < oneDayMs
+    (c) => now - c.updatedAt < oneDayMs,
   );
   const yesterday = filteredConversations.filter(
-    (c) => now - c.updatedAt >= oneDayMs && now - c.updatedAt < 2 * oneDayMs
+    (c) => now - c.updatedAt >= oneDayMs && now - c.updatedAt < 2 * oneDayMs,
   );
   const sevenDays = filteredConversations.filter(
-    (c) => now - c.updatedAt >= 2 * oneDayMs && now - c.updatedAt < sevenDaysMs
+    (c) => now - c.updatedAt >= 2 * oneDayMs && now - c.updatedAt < sevenDaysMs,
   );
-  const older = filteredConversations.filter((c) => now - c.updatedAt >= sevenDaysMs);
+  const older = filteredConversations.filter(
+    (c) => now - c.updatedAt >= sevenDaysMs,
+  );
 
   const groups = [
     { label: "Today", items: today },
@@ -76,7 +78,7 @@ export function ConversationList() {
                   ))}
                 </div>
               </div>
-            ) : null
+            ) : null,
           )}
         </div>
       )}
