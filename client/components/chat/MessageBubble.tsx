@@ -52,18 +52,52 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                   }
                   const codeContent = String(children).replace(/\n$/, "");
 
-                  // Check if this is a code block (not inline)
-                  const isCodeBlock = !inline;
+                  // For inline code, return simple code element
+                  if (inline) {
+                    return (
+                      <code
+                        className={`${className} bg-zinc-200 dark:bg-zinc-700 px-1.5 py-0.5 rounded text-xs`}
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  }
 
-                  return isCodeBlock ? (
-                    <div className="relative rounded-lg my-2 group max-h-96 overflow-hidden">
+                  // For code blocks, return empty - let pre component handle it
+                  return (
+                    <code
+                      className={className}
+                      {...props}
+                    >
+                      {children}
+                    </code>
+                  );
+                },
+                pre({ node, children, ...props }: any) {
+                  // Extract language from the code child
+                  const codeChild = children && Array.isArray(children) ? children[0] : children;
+                  const codeProps = codeChild?.props || {};
+                  const className = codeProps.className || "";
+
+                  let language = "lua";
+                  if (className) {
+                    const langMatch = className.match(/(?:language|lang)-(\w+)/);
+                    if (langMatch) {
+                      language = langMatch[1];
+                    }
+                  }
+
+                  const codeContent = String(codeChild?.props?.children || "").replace(/\n$/, "");
+
+                  return (
+                    <div className="relative rounded-lg my-2 group max-h-96 overflow-hidden" {...props}>
                       <SyntaxHighlighter
                         style={oneDark}
                         language={language}
                         PreTag="div"
                         className="rounded-lg !p-3 !m-0"
                         customStyle={{ fontSize: "13px", lineHeight: "1.4" }}
-                        {...props}
                       >
                         {codeContent}
                       </SyntaxHighlighter>
@@ -80,13 +114,6 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                         )}
                       </button>
                     </div>
-                  ) : (
-                    <code
-                      className={`${className} bg-zinc-200 dark:bg-zinc-700 px-1.5 py-0.5 rounded text-xs`}
-                      {...props}
-                    >
-                      {children}
-                    </code>
                   );
                 },
                 a({ node, ...props }: any) {
