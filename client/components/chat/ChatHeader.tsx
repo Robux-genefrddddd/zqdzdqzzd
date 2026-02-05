@@ -41,7 +41,7 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
   };
 
   return (
-    <div className="h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6">
+    <div className="h-16 border-b border-zinc-200/60 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 backdrop-blur flex items-center justify-between px-6">
       {isRenaming ? (
         <div className="flex gap-2 flex-1">
           <input
@@ -53,11 +53,11 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
               if (e.key === "Escape") setIsRenaming(false);
             }}
             autoFocus
-            className="flex-1 px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleRename}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition"
+            className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition"
           >
             Save
           </button>
