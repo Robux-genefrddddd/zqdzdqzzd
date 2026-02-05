@@ -144,24 +144,6 @@ export const useChatStore = create<ChatState>((set, get) => {
           ...((newMessages.get(conversationId) as Message[]) || []),
           userMessage,
         ]);
-        return { messages: newMessages };
-      });
-
-      // Create empty assistant message for streaming
-      const assistantMessage: Message = {
-        id: `msg-${Date.now() + 1}`,
-        conversationId,
-        role: "assistant",
-        content: "",
-        createdAt: Date.now(),
-      };
-
-      set((state) => {
-        const newMessages = new Map(state.messages);
-        newMessages.set(conversationId, [
-          ...((newMessages.get(conversationId) as Message[]) || []),
-          assistantMessage,
-        ]);
         return { messages: newMessages, isGenerating: true };
       });
 
@@ -173,6 +155,7 @@ export const useChatStore = create<ChatState>((set, get) => {
         // Stream response from provider
         const generator = chatProvider.sendMessage(conversationId, content);
         let hasDetectedSearch = false;
+        let assistantMessageCreated = false;
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
@@ -183,22 +166,38 @@ export const useChatStore = create<ChatState>((set, get) => {
             const newMessages = new Map(state.messages);
             const convMessages = newMessages.get(conversationId) || [];
             const updatedMessages = [...convMessages];
-            const lastMsg = updatedMessages[updatedMessages.length - 1];
 
-            if (lastMsg && lastMsg.role === "assistant") {
-              const newContent = lastMsg.content + chunk.chunk;
-              updatedMessages[updatedMessages.length - 1] = {
-                ...lastMsg,
-                content: newContent,
+            // Create assistant message on first chunk
+            if (!assistantMessageCreated && chunk.chunk) {
+              assistantMessageCreated = true;
+              const assistantMessage: Message = {
+                id: `msg-${Date.now() + 1}`,
+                conversationId,
+                role: "assistant",
+                content: chunk.chunk,
+                createdAt: Date.now(),
               };
+              updatedMessages.push(assistantMessage);
+            } else {
+              // Update existing assistant message
+              const lastMsg = updatedMessages[updatedMessages.length - 1];
+              if (lastMsg && lastMsg.role === "assistant") {
+                const newContent = lastMsg.content + chunk.chunk;
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...lastMsg,
+                  content: newContent,
+                };
 
-              // Detect if AI is searching on internet
-              if (!hasDetectedSearch && newContent.toLowerCase().includes("cherche sur internet")) {
-                hasDetectedSearch = true;
-                return { messages: newMessages, isSearching: true };
+                // Detect if AI is searching on internet
+                if (!hasDetectedSearch && newContent.toLowerCase().includes("cherche sur internet")) {
+                  hasDetectedSearch = true;
+                  newMessages.set(conversationId, updatedMessages);
+                  return { messages: newMessages, isSearching: true };
+                }
               }
             }
 
+            newMessages.set(conversationId, updatedMessages);
             return { messages: newMessages };
           });
         }
