@@ -58,7 +58,7 @@ export function Composer({ conversationId }: ComposerProps) {
   return (
     <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 md:px-6 lg:px-8 py-6 space-y-4">
       {/* Empty state with quick prompts */}
-      {(conversationId && useChatStore((s) => s.messages.get(conversationId))?.length === 0) && (
+      {conversationId && messages?.length === 0 && (
         <div className="max-w-3xl mx-auto">
           <h3 className="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-300">
             Quick prompts
