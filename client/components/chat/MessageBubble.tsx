@@ -37,7 +37,7 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
         ) : (
           <>
             {message.content && (
-              <div className="text-sm prose dark:prose-invert prose-sm max-w-none">
+              <div className="text-sm prose dark:prose-invert prose-sm max-w-none [&_p]:mb-3 [&_p]:leading-relaxed [&_pre]:my-4 [&_ul]:my-3 [&_ol]:my-3 [&_li]:my-1">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
