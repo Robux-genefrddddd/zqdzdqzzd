@@ -99,17 +99,41 @@
 
   /* Optimize scrolling performance */
   .scroll-smooth {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     will-change: scroll-position;
   }
 
   /* Optimize message rendering */
+  .prose {
+    @apply max-w-none;
+  }
+
   .prose pre {
-    @apply max-h-96 overflow-y-auto;
+    @apply max-h-96 overflow-y-auto overscroll-contain;
+    contain: layout style paint;
   }
 
   /* Reduce repaints during streaming */
   [data-testid="message-bubble"] {
     contain: layout style paint;
+  }
+
+  /* Optimize code blocks */
+  pre code {
+    @apply block;
+  }
+
+  /* Performance: use will-change sparingly */
+  .prose p, .prose li {
+    @apply text-zinc-100;
+  }
+
+  /* Reduce animations on low-power devices */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
