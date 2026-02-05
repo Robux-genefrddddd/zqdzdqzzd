@@ -40,7 +40,7 @@ export const useChatStore = create<ChatState>((set, get) => {
     selectedConversationId: null,
     isGenerating: false,
     searchQuery: "",
-    darkMode: false,
+    darkMode: true,
     showMobileSidebar: false,
 
     // Actions
