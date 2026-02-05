@@ -47,12 +47,15 @@ export function MessageList({ conversationId }: MessageListProps) {
       clearTimeout(scrollTimeoutRef.current);
     }
 
-    // Scroll when messages added or when generating
-    if (messageCount > 0 || isGenerating || isSearching) {
-      // Delay scroll to ensure DOM has updated
+    // Only scroll during generation, not constantly
+    if (isGenerating || isSearching) {
+      // Debounce scroll updates to avoid constant reflows
       scrollTimeoutRef.current = setTimeout(() => {
         scrollToBottom();
-      }, 50); // Faster scroll for composing
+      }, 150); // Debounce to avoid crash
+    } else if (messageCount > 0) {
+      // Scroll immediately when generation ends
+      scrollToBottom();
     }
 
     return () => {
@@ -63,12 +66,28 @@ export function MessageList({ conversationId }: MessageListProps) {
   }, [messageCount, isGenerating, isSearching]);
 
   const handleScroll = () => {
-    if (scrollRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-      setShowScrollButton(!isAtBottom);
+    // Debounce scroll detection to avoid constant state updates
+    if (scrollEventTimeoutRef.current) {
+      clearTimeout(scrollEventTimeoutRef.current);
     }
+
+    scrollEventTimeoutRef.current = setTimeout(() => {
+      if (scrollRef.current && !isGenerating && !isSearching) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+        setShowScrollButton(!isAtBottom);
+      }
+    }, 200); // Debounce scroll detection
   };
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (scrollEventTimeoutRef.current) {
+        clearTimeout(scrollEventTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!conversationId) {
     return (
