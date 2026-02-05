@@ -13,6 +13,8 @@ export function Composer({ conversationId }: ComposerProps) {
   const isGenerating = useChatStore((s) => s.isGenerating);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGenerating = useChatStore((s) => s.stopGenerating);
+  const messagesMap = useChatStore((s) => s.messages);
+  const messages = conversationId ? messagesMap.get(conversationId) : undefined;
 
   // Auto-grow textarea
   useEffect(() => {
