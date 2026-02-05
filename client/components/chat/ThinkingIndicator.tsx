@@ -16,15 +16,26 @@ function ThinkingIndicatorComponent() {
 
           {/* Text content */}
           <div className="flex-1">
-            <div className="text-sm font-semibold text-blue-100">Recherche sur internet...</div>
+            <div className="text-sm font-semibold text-blue-100">
+              Recherche sur internet...
+            </div>
             <div className="text-xs text-blue-200 mt-1">Réflexion en cours</div>
           </div>
 
           {/* Loading dots on right */}
           <div className="flex gap-1 flex-shrink-0">
-            <div className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="w-1.5 h-1.5 bg-cyan-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div
+              className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce"
+              style={{ animationDelay: "0ms" }}
+            />
+            <div
+              className="w-1.5 h-1.5 bg-cyan-300 rounded-full animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            />
+            <div
+              className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
           </div>
         </div>
       </div>

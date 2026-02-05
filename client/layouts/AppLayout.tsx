@@ -83,9 +83,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         )}
 
         {/* Main Content */}
-        <div className="relative z-0 flex-1 overflow-hidden">
-          {children}
-        </div>
+        <div className="relative z-0 flex-1 overflow-hidden">{children}</div>
       </div>
     </div>
   );

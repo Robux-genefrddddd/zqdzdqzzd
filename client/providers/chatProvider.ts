@@ -33,7 +33,10 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          const errorMsg = errorData.error || errorData.message || `API error: ${response.status}`;
+          const errorMsg =
+            errorData.error ||
+            errorData.message ||
+            `API error: ${response.status}`;
           console.error("OpenRouter API error:", errorMsg, errorData);
           throw new Error(errorMsg);
         }
@@ -63,7 +66,7 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
             const line = lines[i].trim();
             if (line.startsWith("data: ")) {
               const data = line.slice(6);
-              
+
               if (data === "[DONE]") {
                 yield {
                   chunk: "",
@@ -74,21 +77,24 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
 
               try {
                 const json = JSON.parse(data);
-                
+
                 // Check for error in stream
                 if (json.error) {
                   console.error("Stream error:", json.error);
                   throw new Error(json.error);
                 }
-                
+
                 // Handle usage/token information
                 if (json.usage) {
                   console.log("Usage info:", json.usage);
                   if ((json.usage as any).reasoningTokens) {
-                    console.log("Reasoning tokens:", (json.usage as any).reasoningTokens);
+                    console.log(
+                      "Reasoning tokens:",
+                      (json.usage as any).reasoningTokens,
+                    );
                   }
                 }
-                
+
                 const chunk = json.chunk || "";
                 if (chunk) {
                   yield {

@@ -71,7 +71,9 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
       <div className="flex items-start gap-3 justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{conversation.title}</p>
-          <p className={`text-xs ${isSelected ? "text-zinc-400" : "text-zinc-500"}`}>
+          <p
+            className={`text-xs ${isSelected ? "text-zinc-400" : "text-zinc-500"}`}
+          >
             {new Date(conversation.updatedAt).toLocaleDateString()}
           </p>
         </div>

@@ -54,9 +54,7 @@ export function ConversationList() {
       {/* Conversations grouped by date */}
       {filteredConversations.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-sm text-zinc-400">
-            No conversations yet
-          </p>
+          <p className="text-sm text-zinc-400">No conversations yet</p>
           <p className="text-xs text-zinc-500 mt-1">
             Create one with the button above
           </p>
@@ -65,7 +63,10 @@ export function ConversationList() {
         <div className="space-y-4">
           {groups.map((group, idx) =>
             group.items.length > 0 ? (
-              <div key={group.label} className={idx > 0 ? "border-t border-zinc-800/70 pt-3" : ""}>
+              <div
+                key={group.label}
+                className={idx > 0 ? "border-t border-zinc-800/70 pt-3" : ""}
+              >
                 <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-2 mb-2">
                   {group.label}
                 </h3>

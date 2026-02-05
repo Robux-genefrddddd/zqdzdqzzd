@@ -141,16 +141,16 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
     }
 
     // Signal completion
-    res.write('data: [DONE]\n\n');
+    res.write("data: [DONE]\n\n");
     res.end();
   } catch (error) {
     console.error("Chat handler error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     if (!res.headersSent) {
-      res.status(500).json({ 
-        error: "Failed to get response from OpenRouter", 
-        message: errorMessage 
+      res.status(500).json({
+        error: "Failed to get response from OpenRouter",
+        message: errorMessage,
       });
     } else {
       res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);

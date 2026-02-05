@@ -20,9 +20,7 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
   if (!conversationId || !conversation) {
     return (
       <div className="h-16 border-b border-zinc-800/70 flex items-center justify-center">
-        <p className="text-sm text-zinc-400">
-          Select or create a conversation
-        </p>
+        <p className="text-sm text-zinc-400">Select or create a conversation</p>
       </div>
     );
   }
@@ -64,7 +62,9 @@ export function ChatHeader({ conversationId }: ChatHeaderProps) {
         </div>
       ) : (
         <>
-          <h1 className="text-lg font-semibold text-zinc-100">{conversation.title}</h1>
+          <h1 className="text-lg font-semibold text-zinc-100">
+            {conversation.title}
+          </h1>
 
           {/* Menu */}
           <div className="relative">

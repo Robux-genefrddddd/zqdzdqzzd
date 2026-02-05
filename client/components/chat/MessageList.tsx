@@ -17,7 +17,7 @@ export function MessageList({ conversationId }: MessageListProps) {
 
   // Get the actual messages array
   const allMessages = useChatStore((s) =>
-    conversationId ? s.messages.get(conversationId) || [] : []
+    conversationId ? s.messages.get(conversationId) || [] : [],
   );
 
   // Messages displayed (no filtering of empty assistant message anymore)
@@ -91,7 +91,9 @@ export function MessageList({ conversationId }: MessageListProps) {
     return (
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="mx-auto rounded-2xl bg-zinc-900/40 p-8 ring-1 ring-zinc-800/70 backdrop-blur text-center max-w-md">
-          <h2 className="text-2xl font-semibold mb-2 text-zinc-100">Start a conversation</h2>
+          <h2 className="text-2xl font-semibold mb-2 text-zinc-100">
+            Start a conversation
+          </h2>
           <p className="text-sm text-zinc-400">
             Select a conversation from the sidebar or create a new one
           </p>
@@ -111,25 +113,34 @@ export function MessageList({ conversationId }: MessageListProps) {
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="mx-auto mt-24 max-w-md rounded-2xl bg-zinc-900/40 p-6 ring-1 ring-zinc-800/70 backdrop-blur">
-              <div className="text-base font-semibold text-zinc-100">Start chatting</div>
+              <div className="text-base font-semibold text-zinc-100">
+                Start chatting
+              </div>
               <div className="mt-1 text-sm text-zinc-400">
                 Send your first message below to begin
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {["Explain quantum computing", "Write a short story", "How do I learn TypeScript?", "What's the weather like?"]
-                  .map(t => (
-                    <button key={t}
-                      onClick={() => {
-                        // Trigger composer focus and set input
-                        const event = new CustomEvent('setComposerInput', { detail: t });
-                        window.dispatchEvent(event);
-                      }}
-                      className="rounded-xl bg-zinc-950/40 px-3 py-2 text-sm text-zinc-200 ring-1 ring-zinc-800/70 hover:bg-zinc-900/50 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
-                    >
-                      {t}
-                    </button>
-                  ))}
+                {[
+                  "Explain quantum computing",
+                  "Write a short story",
+                  "How do I learn TypeScript?",
+                  "What's the weather like?",
+                ].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      // Trigger composer focus and set input
+                      const event = new CustomEvent("setComposerInput", {
+                        detail: t,
+                      });
+                      window.dispatchEvent(event);
+                    }}
+                    className="rounded-xl bg-zinc-950/40 px-3 py-2 text-sm text-zinc-200 ring-1 ring-zinc-800/70 hover:bg-zinc-900/50 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+                  >
+                    {t}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -139,7 +150,11 @@ export function MessageList({ conversationId }: MessageListProps) {
               <MessageBubble
                 key={message.id}
                 message={message}
-                isComposing={isGenerating && idx === messages.length - 1 && message.role === "assistant"}
+                isComposing={
+                  isGenerating &&
+                  idx === messages.length - 1 &&
+                  message.role === "assistant"
+                }
               />
             ))}
           </div>

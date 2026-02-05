@@ -128,7 +128,8 @@
   }
 
   /* Performance: use will-change sparingly */
-  .prose p, .prose li {
+  .prose p,
+  .prose li {
     @apply text-zinc-100;
   }
 

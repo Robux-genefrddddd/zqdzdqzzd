@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { Conversation, Message } from "@/types/index";
-import { createMockChatProvider, createOpenRouterChatProvider } from "@/providers/chatProvider";
+import {
+  createMockChatProvider,
+  createOpenRouterChatProvider,
+} from "@/providers/chatProvider";
 
 interface ChatState {
   // Data

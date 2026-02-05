@@ -25,26 +25,32 @@ function ComposerComponent({ conversationId }: ComposerProps) {
     }
   }, [input]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!conversationId || !input.trim() || isGenerating) {
-      return;
-    }
-
-    await sendMessage(conversationId, input.trim());
-    setInput("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
-  }, [conversationId, input, isGenerating, sendMessage]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      handleSubmit(e as any);
-    }
-  }, [handleSubmit]);
+
+      if (!conversationId || !input.trim() || isGenerating) {
+        return;
+      }
+
+      await sendMessage(conversationId, input.trim());
+      setInput("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+    },
+    [conversationId, input, isGenerating, sendMessage],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit(e as any);
+      }
+    },
+    [handleSubmit],
+  );
 
   // Listen for suggestion button clicks
   useEffect(() => {
@@ -55,8 +61,8 @@ function ComposerComponent({ conversationId }: ComposerProps) {
       }, 0);
     };
 
-    window.addEventListener('setComposerInput', handleSetInput);
-    return () => window.removeEventListener('setComposerInput', handleSetInput);
+    window.addEventListener("setComposerInput", handleSetInput);
+    return () => window.removeEventListener("setComposerInput", handleSetInput);
   }, []);
 
   return (
