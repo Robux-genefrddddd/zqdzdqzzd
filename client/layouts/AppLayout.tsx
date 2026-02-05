@@ -11,16 +11,16 @@ export function AppLayout({ children }: AppLayoutProps) {
   const setShowMobileSidebar = useChatStore((s) => s.setShowMobileSidebar);
 
   return (
-    <div className="h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
+    <div className="h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       {/* Desktop Layout */}
       <div className="hidden md:grid h-full grid-cols-[280px_1fr]">
         {/* Sidebar */}
-        <div className="border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+        <div className="border-r border-zinc-200/60 dark:border-zinc-800 bg-white/90 backdrop-blur dark:bg-zinc-900/80">
           <Sidebar />
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col overflow-hidden">{children}</div>
+        <div className="flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">{children}</div>
       </div>
 
       {/* Mobile Layout */}
