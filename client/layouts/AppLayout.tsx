@@ -36,12 +36,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden flex flex-col h-full">
+      <div className="md:hidden flex flex-col h-full relative">
+        {/* Background with radial highlight */}
+        <div className="pointer-events-none absolute inset-0 z-0">
+          {/* Radial gradient highlight */}
+          <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_-20%,rgba(255,255,255,0.08),transparent_60%)]" />
+          {/* Micro noise overlay */}
+          <div className="absolute inset-0 opacity-[0.035] [background-image:radial-gradient(rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:3px_3px]" />
+        </div>
+
         {/* Header with Menu Button */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white/90 backdrop-blur dark:bg-zinc-900/80">
+        <div className="relative z-10 flex items-center gap-3 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white/90 backdrop-blur dark:bg-zinc-900/80">
           <button
             onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors active:scale-[0.99]"
             aria-label="Toggle sidebar"
           >
             {showMobileSidebar ? (
@@ -67,7 +75,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">
+        <div className="relative z-0 flex-1 overflow-hidden">
           {children}
         </div>
       </div>
