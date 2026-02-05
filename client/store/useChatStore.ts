@@ -154,11 +154,9 @@ export const useChatStore = create<ChatState>((set, get) => {
       try {
         // Stream response from provider
         const generator = chatProvider.sendMessage(conversationId, content);
-        let isSearching = false;
         let assistantMessageCreated = false;
         let updateBuffer = "";
         let lastUpdateTime = Date.now();
-        let totalContent = ""; // Track all content received
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
@@ -167,7 +165,6 @@ export const useChatStore = create<ChatState>((set, get) => {
 
           // Buffer chunks for performance - batch updates
           updateBuffer += chunk.chunk;
-          totalContent += chunk.chunk;
           const now = Date.now();
           const shouldUpdate = now - lastUpdateTime > 150 || chunk.isComplete; // Update every 150ms max to avoid crash
 
@@ -178,12 +175,6 @@ export const useChatStore = create<ChatState>((set, get) => {
           const chunkToProcess = updateBuffer;
           updateBuffer = "";
           lastUpdateTime = now;
-
-          // Detect if AI is searching on internet at the beginning
-          const startsWithSearch = totalContent.toLowerCase().trim().startsWith("je vais chercher sur internet");
-
-          // Stop showing search indicator once we have more content
-          const hasMoreContent = totalContent.toLowerCase().length > "je vais chercher sur internet".length + 10;
 
           set((state) => {
             const newMessages = new Map(state.messages);
@@ -201,12 +192,6 @@ export const useChatStore = create<ChatState>((set, get) => {
                 createdAt: Date.now(),
               };
               updatedMessages.push(assistantMessage);
-
-              // Set searching if starts with search phrase
-              if (startsWithSearch) {
-                isSearching = true;
-                return { messages: newMessages, isSearching: true };
-              }
             } else {
               // Update existing assistant message
               const lastMsg = updatedMessages[updatedMessages.length - 1];
@@ -216,18 +201,11 @@ export const useChatStore = create<ChatState>((set, get) => {
                   ...lastMsg,
                   content: newContent,
                 };
-
-                // If was searching and now has more content, stop showing search indicator
-                if (isSearching && hasMoreContent) {
-                  isSearching = false;
-                  newMessages.set(conversationId, updatedMessages);
-                  return { messages: newMessages, isSearching: false };
-                }
               }
             }
 
             newMessages.set(conversationId, updatedMessages);
-            return { messages: newMessages, isSearching };
+            return { messages: newMessages };
           });
         }
 
