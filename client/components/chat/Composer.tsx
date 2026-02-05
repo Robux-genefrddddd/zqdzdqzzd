@@ -117,3 +117,6 @@ function ComposerComponent({ conversationId }: ComposerProps) {
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const Composer = memo(ComposerComponent);
