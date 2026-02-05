@@ -44,14 +44,15 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
                 code({ node, inline, className, children, ...props }: any) {
                   const match = /language-(\w+)/.exec(className || "");
                   const codeContent = String(children).replace(/\n$/, "");
-                  
+
                   return !inline && match ? (
-                    <div className="relative rounded-lg my-2 group">
+                    <div className="relative rounded-lg my-2 group max-h-96 overflow-hidden">
                       <SyntaxHighlighter
                         style={oneDark}
                         language={match[1]}
                         PreTag="div"
-                        className="rounded-lg"
+                        className="rounded-lg !p-3 !m-0"
+                        customStyle={{ fontSize: "13px", lineHeight: "1.4" }}
                         {...props}
                       >
                         {codeContent}
