@@ -32,7 +32,10 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
         });
 
         if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          const errorMsg = errorData.error || `API error: ${response.status}`;
+          console.error("OpenRouter API error:", errorMsg, errorData);
+          throw new Error(errorMsg);
         }
 
         const reader = response.body?.getReader();
