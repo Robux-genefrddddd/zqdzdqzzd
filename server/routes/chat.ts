@@ -27,10 +27,11 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    console.log("Sending message to OpenRouter with model: liquid/lfm-2.5-1.2b-thinking:free");
+    console.log("Sending message to OpenRouter with model: arcee-ai/trinity-large-preview:free");
 
+    // Stream the response to get reasoning tokens in usage
     const stream = await openrouter.chat.send({
-      model: "liquid/lfm-2.5-1.2b-thinking:free",
+      model: "arcee-ai/trinity-large-preview:free",
       messages: [
         {
           role: "user",
@@ -42,11 +43,22 @@ export const handleChat: RequestHandler = async (req, res) => {
 
     console.log("OpenRouter stream started successfully");
 
+    let response = "";
     for await (const chunk of stream) {
       try {
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
+          response += content;
           res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+        }
+
+        // Usage information comes in the final chunk
+        if (chunk.usage) {
+          console.log("Response tokens:", chunk.usage.completionTokens);
+          if ((chunk.usage as any).reasoningTokens) {
+            console.log("Reasoning tokens:", (chunk.usage as any).reasoningTokens);
+          }
+          res.write(`data: ${JSON.stringify({ usage: chunk.usage })}\n\n`);
         }
       } catch (e) {
         console.error("Failed to process chunk:", e);
