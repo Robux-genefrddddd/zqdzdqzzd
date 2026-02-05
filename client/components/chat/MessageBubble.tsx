@@ -36,14 +36,7 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         ) : (
           <>
-            {isComposing && !message.content ? (
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                <span className="text-sm text-zinc-300 ml-1">Composition...</span>
-              </div>
-            ) : (
+            {message.content && (
               <div className="text-sm prose dark:prose-invert prose-sm max-w-none">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
