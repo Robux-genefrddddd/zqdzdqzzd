@@ -47,7 +47,7 @@ export function MessageList({ conversationId }: MessageListProps) {
     }
 
     // Only scroll during generation, not constantly
-    if (isGenerating || isSearching) {
+    if (isGenerating) {
       // Debounce scroll updates to avoid constant reflows
       scrollTimeoutRef.current = setTimeout(() => {
         scrollToBottom();
@@ -62,7 +62,7 @@ export function MessageList({ conversationId }: MessageListProps) {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [messageCount, isGenerating, isSearching]);
+  }, [messageCount, isGenerating]);
 
   const handleScroll = () => {
     // Debounce scroll detection to avoid constant state updates
