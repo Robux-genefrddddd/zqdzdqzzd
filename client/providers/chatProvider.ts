@@ -21,6 +21,8 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
       userMessage: string,
     ): AsyncGenerator<ChatStreamChunk> {
       try {
+        console.log("Sending message to API...");
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
@@ -31,23 +33,27 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
           }),
         });
 
+        console.log("API response status:", response.status);
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          const errorMsg = errorData.error || `API error: ${response.status}`;
+          const errorMsg = errorData.error || errorData.message || `API error: ${response.status}`;
           console.error("OpenRouter API error:", errorMsg, errorData);
           throw new Error(errorMsg);
         }
 
         const reader = response.body?.getReader();
         if (!reader) {
-          throw new Error("No response body");
+          throw new Error("No response body from API");
         }
 
+        console.log("Starting to read stream...");
         let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) {
+            console.log("Stream completed");
             yield {
               chunk: "",
               isComplete: true,
@@ -63,7 +69,9 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
             const line = lines[i].trim();
             if (line.startsWith("data: ")) {
               const data = line.slice(6);
+
               if (data === "[DONE]") {
+                console.log("Received DONE signal");
                 yield {
                   chunk: "",
                   isComplete: true,
@@ -73,6 +81,13 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
 
               try {
                 const json = JSON.parse(data);
+
+                // Check for error in stream
+                if (json.error) {
+                  console.error("Stream error:", json.error);
+                  throw new Error(json.error);
+                }
+
                 const chunk = json.chunk || "";
                 if (chunk) {
                   yield {
@@ -81,16 +96,17 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
                   };
                 }
               } catch (e) {
-                console.error("Failed to parse stream data:", e);
+                console.error("Failed to parse stream data:", e, data);
               }
             }
           }
         }
       } catch (error) {
         console.error("Chat provider error:", error);
+        const errorMsg = error instanceof Error ? error.message : String(error);
         // Yield error message to user
         yield {
-          chunk: "\n\n[Error: Failed to get response. Please try again.]",
+          chunk: `\n\n[Error: ${errorMsg}]`,
           isComplete: true,
         };
       }
