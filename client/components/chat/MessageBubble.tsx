@@ -8,9 +8,10 @@ import { Copy, Check } from "lucide-react";
 
 interface MessageBubbleProps {
   message: Message;
+  isComposing?: boolean;
 }
 
-function MessageBubbleComponent({ message }: MessageBubbleProps) {
+function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
