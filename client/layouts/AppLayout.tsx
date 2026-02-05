@@ -26,7 +26,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Mobile Layout */}
       <div className="md:hidden flex flex-col h-full">
         {/* Header with Menu Button */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white/90 backdrop-blur dark:bg-zinc-900/80">
           <button
             onClick={() => setShowMobileSidebar(!showMobileSidebar)}
             className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition"
@@ -49,13 +49,13 @@ export function AppLayout({ children }: AppLayoutProps) {
           />
         )}
         {showMobileSidebar && (
-          <div className="absolute top-14 left-0 right-0 bottom-0 bg-zinc-50 dark:bg-zinc-900 z-50 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto">
+          <div className="absolute top-14 left-0 right-0 bottom-0 bg-white/90 backdrop-blur dark:bg-zinc-900/80 z-50 border-r border-zinc-200/60 dark:border-zinc-800 overflow-y-auto">
             <Sidebar />
           </div>
         )}
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden">{children}</div>
+        <div className="flex-1 overflow-hidden bg-gradient-to-b from-zinc-50 to-zinc-50 dark:from-zinc-950 dark:to-zinc-950">{children}</div>
       </div>
     </div>
   );
