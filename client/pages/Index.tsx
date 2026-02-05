@@ -1,62 +1,37 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { useChatStore } from "@/store/useChatStore";
+import { AppLayout } from "@/layouts/AppLayout";
+import { ChatHeader } from "@/components/chat/ChatHeader";
+import { MessageList } from "@/components/chat/MessageList";
+import { Composer } from "@/components/chat/Composer";
+import { useEffect } from "react";
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
+  const selectedConversationId = useChatStore((s) => s.selectedConversationId);
+  const conversations = useChatStore((s) => s.conversations);
+  const createConversation = useChatStore((s) => s.createConversation);
+  const darkMode = useChatStore((s) => s.darkMode);
+
+  // Initialize app theme
   useEffect(() => {
-    fetchDemo();
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    }
+  }, [darkMode]);
+
+  // Create first conversation on mount if none exist
+  useEffect(() => {
+    if (conversations.length === 0) {
+      createConversation();
+    }
   }, []);
 
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+    <AppLayout>
+      <div className="flex flex-col h-full overflow-hidden">
+        <ChatHeader conversationId={selectedConversationId} />
+        <MessageList conversationId={selectedConversationId} />
+        <Composer conversationId={selectedConversationId} />
       </div>
-    </div>
+    </AppLayout>
   );
 }
