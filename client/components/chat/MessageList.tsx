@@ -16,11 +16,16 @@ export function MessageList({ conversationId }: MessageListProps) {
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      setShowScrollButton(false);
+    if (scrollRef.current && messages.length > 0) {
+      // Use setTimeout to ensure DOM has updated
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+          setShowScrollButton(false);
+        }
+      }, 0);
     }
-  }, [messages]);
+  }, [messages.length, conversationId]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
