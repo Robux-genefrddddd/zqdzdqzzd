@@ -183,13 +183,13 @@ export const useChatStore = create<ChatState>((set, get) => {
             const updatedMessages = [...convMessages];
 
             // Create assistant message on first chunk
-            if (!assistantMessageCreated && chunk.chunk) {
+            if (!assistantMessageCreated && chunkToProcess) {
               assistantMessageCreated = true;
               const assistantMessage: Message = {
                 id: `msg-${Date.now() + 1}`,
                 conversationId,
                 role: "assistant",
-                content: chunk.chunk,
+                content: chunkToProcess,
                 createdAt: Date.now(),
               };
               updatedMessages.push(assistantMessage);
@@ -197,7 +197,7 @@ export const useChatStore = create<ChatState>((set, get) => {
               // Update existing assistant message
               const lastMsg = updatedMessages[updatedMessages.length - 1];
               if (lastMsg && lastMsg.role === "assistant") {
-                const newContent = lastMsg.content + chunk.chunk;
+                const newContent = lastMsg.content + chunkToProcess;
                 updatedMessages[updatedMessages.length - 1] = {
                   ...lastMsg,
                   content: newContent,
