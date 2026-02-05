@@ -125,11 +125,12 @@ function MessageBubbleComponent({ message, isComposing = false }: MessageBubbleP
   );
 }
 
-// Memoize to prevent unnecessary re-renders
+// Memoize to prevent unnecessary re-renders - only update if content changes
 export const MessageBubble = memo(MessageBubbleComponent, (prev, next) => {
-  return (
-    prev.message.id === next.message.id &&
-    prev.message.content === next.message.content &&
-    prev.isComposing === next.isComposing
-  );
+  // Only re-render if content actually changed or composing status changed
+  const contentChanged = prev.message.content !== next.message.content;
+  const composingChanged = prev.isComposing !== next.isComposing;
+
+  // Return true if props are SAME (skip render)
+  return !contentChanged && !composingChanged;
 });
