@@ -10,6 +10,7 @@ interface ChatState {
 
   // UI State
   isGenerating: boolean;
+  isSearching: boolean;
   searchQuery: string;
   darkMode: boolean;
   showMobileSidebar: boolean;
