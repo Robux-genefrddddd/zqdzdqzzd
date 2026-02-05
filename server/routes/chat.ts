@@ -15,7 +15,6 @@ export const handleChat: RequestHandler = async (req, res) => {
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    console.error("OpenRouter API key not configured");
     res.status(500).json({ error: "OpenRouter API key not configured" });
     return;
   }
@@ -27,8 +26,6 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    console.log("Sending message to OpenRouter with model: arcee-ai/trinity-large-preview:free");
-
     // Stream the response to get reasoning tokens in usage
     const stream = await openrouter.chat.send({
       model: "arcee-ai/trinity-large-preview:free",
@@ -45,38 +42,19 @@ export const handleChat: RequestHandler = async (req, res) => {
       stream: true,
     });
 
-    console.log("OpenRouter stream started successfully");
-
     let response = "";
-    let chunkCount = 0;
-
     for await (const chunk of stream) {
-      try {
-        const content = chunk.choices[0]?.delta?.content;
-        console.log("Server received chunk:", { content, hasContent: !!content });
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        response += content;
+        res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+      }
 
-        if (content) {
-          chunkCount++;
-          response += content;
-          const dataToSend = JSON.stringify({ chunk: content });
-          console.log("Server sending:", dataToSend);
-          res.write(`data: ${dataToSend}\n\n`);
-        }
-
-        // Usage information comes in the final chunk
-        if (chunk.usage) {
-          console.log("Response tokens:", chunk.usage.completionTokens);
-          if ((chunk.usage as any).reasoningTokens) {
-            console.log("Reasoning tokens:", (chunk.usage as any).reasoningTokens);
-          }
-          res.write(`data: ${JSON.stringify({ usage: chunk.usage })}\n\n`);
-        }
-      } catch (e) {
-        console.error("Failed to process chunk:", e);
+      // Usage information comes in the final chunk
+      if (chunk.usage) {
+        console.log("Reasoning tokens:", (chunk.usage as any).reasoningTokens);
       }
     }
-
-    console.log("Stream finished on server - chunks sent:", chunkCount, "response length:", response.length);
 
     // Signal completion
     res.write('data: [DONE]\n\n');
