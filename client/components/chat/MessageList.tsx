@@ -121,6 +121,11 @@ export function MessageList({ conversationId }: MessageListProps) {
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
+
+            {/* Show thinking indicator while generating */}
+            {isGenerating && (
+              <ThinkingIndicator />
+            )}
           </div>
         )}
       </div>
