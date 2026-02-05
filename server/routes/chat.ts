@@ -1,4 +1,9 @@
 import { RequestHandler } from "express";
+import { OpenRouter } from "@openrouter/sdk";
+
+const openrouter = new OpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
 
 export const handleChat: RequestHandler = async (req, res) => {
   const { message } = req.body;
@@ -22,98 +27,46 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    console.log("Sending message to OpenRouter...");
-    
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://chatapp.example.com",
-        "X-Title": "ChatGPT-like",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: message,
-          },
-        ],
-        stream: true,
-      }),
+    console.log("Sending message to OpenRouter with model: liquid/lfm-2.5-1.2b-thinking:free");
+
+    const stream = await openrouter.chat.send({
+      model: "liquid/lfm-2.5-1.2b-thinking:free",
+      messages: [
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+      stream: true,
     });
 
-    console.log("OpenRouter response status:", response.status);
+    console.log("OpenRouter stream started successfully");
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenRouter API error response:", errorText);
-      const errorData = { error: `API error: ${response.status}`, details: errorText };
-      res.status(response.status).json(errorData);
-      return;
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      console.error("No response body from OpenRouter");
-      res.status(500).json({ error: "No response body from OpenRouter" });
-      return;
-    }
-
-    let buffer = "";
-
-    const readChunk = async () => {
+    for await (const chunk of stream) {
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            res.write('data: [DONE]\n\n');
-            res.end();
-            break;
-          }
-
-          buffer += new TextDecoder().decode(value);
-          const lines = buffer.split("\n");
-          buffer = lines[lines.length - 1];
-
-          for (let i = 0; i < lines.length - 1; i++) {
-            const line = lines[i].trim();
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") {
-                res.write('data: [DONE]\n\n');
-                res.end();
-                return;
-              }
-              try {
-                const json = JSON.parse(data);
-                const content = json.choices?.[0]?.delta?.content || "";
-                if (content) {
-                  res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
-                }
-              } catch (e) {
-                console.error("Failed to parse OpenRouter response:", e);
-              }
-            }
-          }
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+          res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
         }
-      } catch (error) {
-        console.error("Stream reading error:", error);
-        if (!res.writableEnded) {
-          res.write('data: [ERROR]\n\n');
-          res.end();
-        }
+      } catch (e) {
+        console.error("Failed to process chunk:", e);
       }
-    };
+    }
 
-    await readChunk();
+    // Signal completion
+    res.write('data: [DONE]\n\n');
+    res.end();
   } catch (error) {
     console.error("Chat handler error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
     if (!res.headersSent) {
-      res.status(500).json({ error: "Internal server error", message: String(error) });
+      res.status(500).json({ 
+        error: "Failed to get response from OpenRouter", 
+        message: errorMessage 
+      });
     } else {
-      res.write('data: [ERROR]\n\n');
+      res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);
       res.end();
     }
   }
