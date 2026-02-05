@@ -63,9 +63,9 @@ export function ConversationList() {
         </div>
       ) : (
         <div className="space-y-4">
-          {groups.map((group) =>
+          {groups.map((group, idx) =>
             group.items.length > 0 ? (
-              <div key={group.label} className="border-t border-zinc-800/70 pt-3">
+              <div key={group.label} className={idx > 0 ? "border-t border-zinc-800/70 pt-3" : ""}>
                 <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-2 mb-2">
                   {group.label}
                 </h3>
