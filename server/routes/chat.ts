@@ -48,12 +48,19 @@ export const handleChat: RequestHandler = async (req, res) => {
     console.log("OpenRouter stream started successfully");
 
     let response = "";
+    let chunkCount = 0;
+
     for await (const chunk of stream) {
       try {
         const content = chunk.choices[0]?.delta?.content;
+        console.log("Server received chunk:", { content, hasContent: !!content });
+
         if (content) {
+          chunkCount++;
           response += content;
-          res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
+          const dataToSend = JSON.stringify({ chunk: content });
+          console.log("Server sending:", dataToSend);
+          res.write(`data: ${dataToSend}\n\n`);
         }
 
         // Usage information comes in the final chunk
@@ -68,6 +75,8 @@ export const handleChat: RequestHandler = async (req, res) => {
         console.error("Failed to process chunk:", e);
       }
     }
+
+    console.log("Stream finished on server - chunks sent:", chunkCount, "response length:", response.length);
 
     // Signal completion
     res.write('data: [DONE]\n\n');
