@@ -61,17 +61,17 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
 
   return (
     <div
-      className={`group relative px-3 py-2 rounded-xl cursor-pointer transition ${
+      className={`group relative px-3 py-2 rounded-xl cursor-pointer transition-all active:scale-[0.98] ${
         isSelected
-          ? "bg-blue-500/10 dark:bg-blue-500/10 text-blue-900 dark:text-blue-200 ring-1 ring-blue-200/30 dark:ring-blue-500/30"
-          : "hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60"
+          ? "bg-zinc-900/30 text-zinc-100 ring-1 ring-blue-500/20 hover:bg-zinc-900/50"
+          : "text-zinc-300 hover:bg-zinc-800/40 ring-1 ring-transparent hover:ring-zinc-800/70"
       }`}
       onClick={() => selectConversation(conversation.id)}
     >
       <div className="flex items-start gap-3 justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{conversation.title}</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className={`text-xs ${isSelected ? "text-zinc-400" : "text-zinc-500"}`}>
             {new Date(conversation.updatedAt).toLocaleDateString()}
           </p>
         </div>
@@ -83,7 +83,7 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
-            className="p-1 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition"
+            className="p-1 opacity-0 group-hover:opacity-100 hover:bg-zinc-700/60 active:scale-[0.95] rounded transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             aria-label="More options"
           >
             <MoreVertical className="w-4 h-4" />
