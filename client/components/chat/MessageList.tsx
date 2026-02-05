@@ -122,9 +122,11 @@ export function MessageList({ conversationId }: MessageListProps) {
               <MessageBubble key={message.id} message={message} />
             ))}
 
-            {/* Show thinking indicator while generating */}
+            {/* Show thinking indicator while generating - appears before assistant response */}
             {isGenerating && (
-              <ThinkingIndicator />
+              <div key="thinking">
+                <ThinkingIndicator />
+              </div>
             )}
           </div>
         )}
