@@ -10,7 +10,7 @@ export function Sidebar() {
       {/* Header */}
       <div className="p-4 border-b border-zinc-800/70">
         <h2 className="text-sm font-semibold text-zinc-100 mb-4">
-          PinPinIA
+          PinPin-IA 5.1
         </h2>
         <button
           onClick={createConversation}
