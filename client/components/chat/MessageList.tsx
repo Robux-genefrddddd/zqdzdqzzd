@@ -70,13 +70,6 @@ export function MessageList({ conversationId }: MessageListProps) {
     }
   };
 
-  const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      setShowScrollButton(false);
-    }
-  };
-
   if (!conversationId) {
     return (
       <div className="flex-1 flex items-center justify-center px-4">
