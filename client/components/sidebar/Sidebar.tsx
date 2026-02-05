@@ -1,11 +1,9 @@
 import { useChatStore } from "@/store/useChatStore";
 import { ConversationList } from "./ConversationList";
-import { Plus, Moon, Sun, LogOut, User, Settings } from "lucide-react";
+import { Plus, LogOut, User, Settings } from "lucide-react";
 
 export function Sidebar() {
   const createConversation = useChatStore((s) => s.createConversation);
-  const darkMode = useChatStore((s) => s.darkMode);
-  const toggleDarkMode = useChatStore((s) => s.toggleDarkMode);
 
   return (
     <div className="flex flex-col h-full">
