@@ -10,32 +10,29 @@ interface MessageListProps {
 export function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const previousCountRef = useRef<number>(0);
 
-  // Select messages for specific conversation
+  // Use a selector that returns stable value (just count)
+  const messageCount = useChatStore(
+    (s) => (conversationId ? s.messages.get(conversationId)?.length ?? 0 : 0),
+    (a, b) => a === b // Compare previous and current, only trigger if count actually changed
+  );
+
+  // Get the actual messages array
   const messages = useChatStore((s) =>
     conversationId ? s.messages.get(conversationId) || [] : []
   );
 
-  const currentCount = messages.length;
-
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when message count changes
   useEffect(() => {
-    // Only scroll if count actually increased
-    if (currentCount > previousCountRef.current && currentCount > 0) {
-      previousCountRef.current = currentCount;
-
-      // Use setTimeout to ensure DOM has updated
+    if (messageCount > 0) {
       setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
           setShowScrollButton(false);
         }
       }, 0);
-    } else {
-      previousCountRef.current = currentCount;
     }
-  }, [currentCount]);
+  }, [messageCount]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
