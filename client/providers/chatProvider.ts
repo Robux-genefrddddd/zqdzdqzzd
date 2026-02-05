@@ -88,6 +88,14 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
                   throw new Error(json.error);
                 }
 
+                // Handle usage/token information
+                if (json.usage) {
+                  console.log("Usage info:", json.usage);
+                  if ((json.usage as any).reasoningTokens) {
+                    console.log("Reasoning tokens:", (json.usage as any).reasoningTokens);
+                  }
+                }
+
                 const chunk = json.chunk || "";
                 if (chunk) {
                   yield {
