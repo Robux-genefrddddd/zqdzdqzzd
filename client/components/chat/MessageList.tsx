@@ -11,6 +11,7 @@ interface MessageListProps {
 export function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Use a selector that returns stable value (just count)
   const messageCount = useChatStore(
@@ -18,22 +19,48 @@ export function MessageList({ conversationId }: MessageListProps) {
     (a, b) => a === b // Compare previous and current, only trigger if count actually changed
   );
 
+  const isGenerating = useChatStore((s) => s.isGenerating);
+
   // Get the actual messages array
   const messages = useChatStore((s) =>
     conversationId ? s.messages.get(conversationId) || [] : []
   );
 
-  // Auto-scroll to bottom when message count changes
-  useEffect(() => {
-    if (messageCount > 0) {
-      setTimeout(() => {
-        if (scrollRef.current) {
-          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-          setShowScrollButton(false);
-        }
-      }, 0);
+  // Smooth auto-scroll to bottom
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      const scrollContainer = scrollRef.current;
+      const targetScroll = scrollContainer.scrollHeight;
+
+      // Smooth scroll instead of instant
+      scrollContainer.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+      setShowScrollButton(false);
     }
-  }, [messageCount]);
+  };
+
+  // Auto-scroll when messages change or AI is generating
+  useEffect(() => {
+    // Clear any pending scroll timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    if (messageCount > 0 || isGenerating) {
+      // Delay scroll to ensure DOM has updated
+      scrollTimeoutRef.current = setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [messageCount, isGenerating]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
