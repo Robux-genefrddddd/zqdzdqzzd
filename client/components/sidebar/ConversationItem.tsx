@@ -91,14 +91,14 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
 
           {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-xl shadow-md z-10 min-w-max overflow-hidden">
+            <div className="absolute right-0 top-full mt-1 bg-zinc-900/80 border border-zinc-800/70 rounded-xl shadow-lg z-10 min-w-max overflow-hidden backdrop-blur ring-1 ring-zinc-700/30">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsRenaming(true);
                   setShowMenu(false);
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition text-left"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 active:scale-[0.98] transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
               >
                 <Edit2 className="w-4 h-4" />
                 Rename
@@ -108,7 +108,7 @@ export function ConversationItem({ conversation }: ConversationItemProps) {
                   e.stopPropagation();
                   handleDelete();
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition text-left"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/40 active:scale-[0.98] transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
