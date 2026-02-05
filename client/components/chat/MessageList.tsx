@@ -13,12 +13,6 @@ export function MessageList({ conversationId }: MessageListProps) {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Use a selector that returns stable value (just count)
-  const messageCount = useChatStore(
-    (s) => (conversationId ? s.messages.get(conversationId)?.length ?? 0 : 0),
-    (a, b) => a === b // Compare previous and current, only trigger if count actually changed
-  );
-
   const isGenerating = useChatStore((s) => s.isGenerating);
 
   // Get the actual messages array
@@ -32,6 +26,9 @@ export function MessageList({ conversationId }: MessageListProps) {
       ? allMessages.slice(0, -1)
       : allMessages
     : allMessages;
+
+  // Message count for scrolling
+  const messageCount = messages.length;
 
   // Smooth auto-scroll to bottom
   const scrollToBottom = () => {
