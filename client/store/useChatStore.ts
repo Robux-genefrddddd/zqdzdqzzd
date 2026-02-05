@@ -156,11 +156,26 @@ export const useChatStore = create<ChatState>((set, get) => {
         const generator = chatProvider.sendMessage(conversationId, content);
         let hasDetectedSearch = false;
         let assistantMessageCreated = false;
+        let updateBuffer = "";
+        let lastUpdateTime = Date.now();
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
             break;
           }
+
+          // Buffer chunks for performance - batch updates
+          updateBuffer += chunk.chunk;
+          const now = Date.now();
+          const shouldUpdate = now - lastUpdateTime > 50 || chunk.isComplete; // Update every 50ms max
+
+          if (!shouldUpdate && updateBuffer.length < 500) {
+            continue; // Skip update, buffer more chunks
+          }
+
+          const chunkToProcess = updateBuffer;
+          updateBuffer = "";
+          lastUpdateTime = now;
 
           set((state) => {
             const newMessages = new Map(state.messages);
