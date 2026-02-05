@@ -237,7 +237,7 @@ export const useChatStore = create<ChatState>((set, get) => {
           get().renameConversation(conversationId, titlePreview);
         }
       } finally {
-        set({ isGenerating: false, isSearching: false });
+        set({ isGenerating: false });
       }
     },
 
