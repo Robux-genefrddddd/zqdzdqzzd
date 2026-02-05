@@ -34,6 +34,10 @@ export const handleChat: RequestHandler = async (req, res) => {
       model: "arcee-ai/trinity-large-preview:free",
       messages: [
         {
+          role: "system",
+          content: "Tu es un expert en programmation Roblox et Lua. Tu dois toujours répondre UNIQUEMENT en français, sans exception. Réponds à toutes les questions sur le code Roblox, la syntaxe Lua, les API Roblox, et aide l'utilisateur à développer des jeux sur Roblox Studio. Sois précis, clair et fournis des exemples de code en Lua quand c'est pertinent.",
+        },
+        {
           role: "user",
           content: message,
         },
