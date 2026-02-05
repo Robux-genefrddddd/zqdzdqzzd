@@ -51,7 +51,7 @@ export function MessageList({ conversationId }: MessageListProps) {
   }
 
   return (
-    <div className="flex-1 relative flex flex-col overflow-hidden">
+    <div className="flex-1 relative flex flex-col overflow-hidden bg-gradient-to-b from-zinc-50/50 to-zinc-100/50 dark:from-zinc-950/50 dark:to-zinc-900/50">
       {/* Messages Container */}
       <div
         ref={scrollRef}
@@ -61,7 +61,7 @@ export function MessageList({ conversationId }: MessageListProps) {
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="text-lg font-semibold mb-2 text-zinc-900 dark:text-zinc-100">
                 Start chatting
               </h3>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -70,7 +70,7 @@ export function MessageList({ conversationId }: MessageListProps) {
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto w-full">
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
@@ -83,11 +83,11 @@ export function MessageList({ conversationId }: MessageListProps) {
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2">
           <button
             onClick={scrollToBottom}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full shadow-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 rounded-full shadow-md hover:bg-zinc-50 dark:hover:bg-zinc-700 transition text-sm font-medium"
             aria-label="Scroll to bottom"
           >
             <ChevronDown className="w-4 h-4" />
-            <span className="text-sm">New messages</span>
+            <span>New messages</span>
           </button>
         </div>
       )}
