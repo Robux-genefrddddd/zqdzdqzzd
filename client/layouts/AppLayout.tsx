@@ -46,10 +46,10 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Header with Menu Button */}
-        <div className="relative z-10 flex items-center gap-3 px-4 py-3 border-b border-zinc-200/60 dark:border-zinc-800 bg-white/90 backdrop-blur dark:bg-zinc-900/80">
+        <div className="relative z-20 flex items-center gap-3 px-4 py-3 border-b border-zinc-800/70">
           <button
             onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors active:scale-[0.99]"
+            className="p-2 hover:bg-zinc-800/40 active:scale-[0.95] rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             aria-label="Toggle sidebar"
           >
             {showMobileSidebar ? (
@@ -58,19 +58,27 @@ export function AppLayout({ children }: AppLayoutProps) {
               <Menu className="w-5 h-5" />
             )}
           </button>
-          <h1 className="font-semibold">Chat</h1>
+          <h1 className="font-semibold text-zinc-100">Chat</h1>
         </div>
 
         {/* Sidebar Drawer */}
         {showMobileSidebar && (
           <div
-            className="absolute inset-0 bg-black/50 z-40"
+            className="absolute inset-0 bg-black/50 z-40 backdrop-blur-sm"
             onClick={() => setShowMobileSidebar(false)}
           />
         )}
         {showMobileSidebar && (
-          <div className="absolute top-14 left-0 right-0 bottom-0 bg-white/90 backdrop-blur dark:bg-zinc-900/80 z-50 border-r border-zinc-200/60 dark:border-zinc-800 overflow-y-auto">
-            <Sidebar />
+          <div className="absolute top-14 left-0 right-0 bottom-0 bg-zinc-950 z-50 border-r border-zinc-800/70 overflow-y-auto">
+            {/* Background with radial highlight for drawer */}
+            <div className="pointer-events-none fixed inset-0 top-14 z-0">
+              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_-20%,rgba(255,255,255,0.08),transparent_60%)]" />
+              <div className="absolute inset-0 opacity-[0.035] [background-image:radial-gradient(rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:3px_3px]" />
+            </div>
+            {/* Sidebar content */}
+            <div className="relative z-10">
+              <Sidebar />
+            </div>
           </div>
         )}
 
