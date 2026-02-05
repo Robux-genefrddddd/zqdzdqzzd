@@ -69,6 +69,7 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
             const line = lines[i].trim();
             if (line.startsWith("data: ")) {
               const data = line.slice(6);
+              console.log("Client received SSE line:", data);
 
               if (data === "[DONE]") {
                 console.log("Received DONE signal");
@@ -81,6 +82,7 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
 
               try {
                 const json = JSON.parse(data);
+                console.log("Parsed JSON:", json);
 
                 // Check for error in stream
                 if (json.error) {
@@ -97,7 +99,9 @@ export const createOpenRouterChatProvider = (): ChatProvider => {
                 }
 
                 const chunk = json.chunk || "";
+                console.log("Extracted chunk:", chunk);
                 if (chunk) {
+                  console.log("Yielding chunk to store");
                   yield {
                     chunk,
                     isComplete: false,
