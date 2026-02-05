@@ -71,7 +71,7 @@ export function MessageList({ conversationId }: MessageListProps) {
     }
 
     scrollEventTimeoutRef.current = setTimeout(() => {
-      if (scrollRef.current && !isGenerating && !isSearching) {
+      if (scrollRef.current && !isGenerating) {
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
         const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
         setShowScrollButton(!isAtBottom);
