@@ -101,6 +101,9 @@
   .scroll-smooth {
     scroll-behavior: auto;
     will-change: scroll-position;
+    contain: layout style;
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
 
   /* Optimize message rendering */
