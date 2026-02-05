@@ -23,6 +23,7 @@ interface ChatState {
   setSearchQuery: (query: string) => void;
   toggleDarkMode: () => void;
   setShowMobileSidebar: (show: boolean) => void;
+  setIsSearching: (searching: boolean) => void;
 
   // Chat actions
   sendMessage: (conversationId: string, content: string) => Promise<void>;
