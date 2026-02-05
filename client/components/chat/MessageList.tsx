@@ -49,11 +49,12 @@ export function MessageList({ conversationId }: MessageListProps) {
       clearTimeout(scrollTimeoutRef.current);
     }
 
-    if (messageCount > 0 || isGenerating) {
+    // Scroll when messages added or when generating
+    if (messageCount > 0 || isGenerating || isSearching) {
       // Delay scroll to ensure DOM has updated
       scrollTimeoutRef.current = setTimeout(() => {
         scrollToBottom();
-      }, 100);
+      }, 50); // Faster scroll for composing
     }
 
     return () => {
@@ -61,7 +62,7 @@ export function MessageList({ conversationId }: MessageListProps) {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [messageCount, isGenerating]);
+  }, [messageCount, isGenerating, isSearching]);
 
   const handleScroll = () => {
     if (scrollRef.current) {
