@@ -22,9 +22,16 @@ export function MessageList({ conversationId }: MessageListProps) {
   const isGenerating = useChatStore((s) => s.isGenerating);
 
   // Get the actual messages array
-  const messages = useChatStore((s) =>
+  const allMessages = useChatStore((s) =>
     conversationId ? s.messages.get(conversationId) || [] : []
   );
+
+  // Filter out empty assistant message if we're generating (it gets replaced by thinking indicator)
+  const messages = isGenerating && allMessages.length > 0
+    ? allMessages[allMessages.length - 1]?.role === "assistant" && !allMessages[allMessages.length - 1]?.content
+      ? allMessages.slice(0, -1)
+      : allMessages
+    : allMessages;
 
   // Smooth auto-scroll to bottom
   const scrollToBottom = () => {
