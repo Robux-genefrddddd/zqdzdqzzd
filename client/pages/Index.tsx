@@ -23,7 +23,7 @@ export default function Index() {
     if (conversations.length === 0) {
       createConversation();
     }
-  }, []);
+  }, [conversations.length, createConversation]);
 
   return (
     <AppLayout>
