@@ -34,7 +34,7 @@ export function Sidebar() {
         {/* Theme Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition"
+          className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition"
           aria-label="Toggle dark mode"
         >
           <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
@@ -46,19 +46,19 @@ export function Sidebar() {
         </button>
 
         {/* Settings */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition">
           <span>Settings</span>
           <Settings className="w-4 h-4" />
         </button>
 
         {/* Account */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition">
           <span>Account</span>
           <User className="w-4 h-4" />
         </button>
 
         {/* Logout */}
-        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition">
+        <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition">
           <span>Logout</span>
           <LogOut className="w-4 h-4" />
         </button>
