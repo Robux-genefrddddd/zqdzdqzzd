@@ -28,14 +28,13 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    // Stream the response to get reasoning tokens in usage
-    const stream = await openrouter.chat.stream(
-      {
-        model: "arcee-ai/trinity-large-preview:free",
-        messages: [
-          {
-            role: "system",
-            content: `Tu es **PinPin-IA 5.1**, une IA spécialisée en programmation Roblox et Lua.
+    // Stream the response from OpenRouter via OpenAI client
+    const stream = await client.chat.completions.create({
+      model: "arcee-ai/trinity-large-preview:free",
+      messages: [
+        {
+          role: "system",
+          content: `Tu es **PinPin-IA 5.1**, une IA spécialisée en programmation Roblox et Lua.
 
 STYLE DE COMMUNICATION:
 - Reste professionnel et concis
@@ -120,26 +119,19 @@ PAS DE:
 ✗ Code désoptimisé
 
 Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimisé.`,
-          },
-          {
-            role: "user",
-            content: message,
-          },
-        ],
-      }
-    );
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+      stream: true,
+    });
 
-    let response = "";
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
-        response += content;
         res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
-      }
-
-      // Usage information comes in the final chunk
-      if (chunk.usage) {
-        console.log("Reasoning tokens:", (chunk.usage as any).reasoningTokens);
       }
     }
 
