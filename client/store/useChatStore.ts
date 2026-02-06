@@ -133,11 +133,20 @@ export const useChatStore = create<ChatState>((set, get) => {
         updatedAt: Date.now(),
       };
 
-      set((state) => ({
-        conversations: [conversation, ...state.conversations],
-        selectedConversationId: id,
-        messages: new Map(state.messages).set(id, []),
-      }));
+      set((state) => {
+        const newConversations = [conversation, ...state.conversations];
+        const newMessages = new Map(state.messages).set(id, []);
+
+        // Save to localStorage
+        saveConversations(newConversations);
+        saveMessages(newMessages);
+
+        return {
+          conversations: newConversations,
+          selectedConversationId: id,
+          messages: newMessages,
+        };
+      });
 
       return id;
     },
@@ -147,6 +156,10 @@ export const useChatStore = create<ChatState>((set, get) => {
         const newConversations = state.conversations.filter((c) => c.id !== id);
         const newMessages = new Map(state.messages);
         newMessages.delete(id);
+
+        // Save to localStorage
+        saveConversations(newConversations);
+        saveMessages(newMessages);
 
         return {
           conversations: newConversations,
@@ -160,11 +173,18 @@ export const useChatStore = create<ChatState>((set, get) => {
     },
 
     renameConversation: (id: string, title: string) => {
-      set((state) => ({
-        conversations: state.conversations.map((c) =>
+      set((state) => {
+        const newConversations = state.conversations.map((c) =>
           c.id === id ? { ...c, title, updatedAt: Date.now() } : c,
-        ),
-      }));
+        );
+
+        // Save to localStorage
+        saveConversations(newConversations);
+
+        return {
+          conversations: newConversations,
+        };
+      });
     },
 
     selectConversation: (id: string) => {
