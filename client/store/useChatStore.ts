@@ -329,7 +329,7 @@ export const useChatStore = create<ChatState>((set, get) => {
           userMessage,
         ]);
 
-        // Save to Firebase (async)
+        // Save to Firebase (async, silent failure - work offline)
         (async () => {
           try {
             await setDoc(
@@ -340,7 +340,7 @@ export const useChatStore = create<ChatState>((set, get) => {
               }
             );
           } catch (e) {
-            console.warn("Failed to save user message to Firebase", e);
+            // Silently fail - work offline
           }
         })();
 
