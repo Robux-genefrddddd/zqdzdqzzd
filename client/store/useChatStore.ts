@@ -329,8 +329,20 @@ export const useChatStore = create<ChatState>((set, get) => {
           userMessage,
         ]);
 
-        // Save to localStorage
-        saveMessages(newMessages);
+        // Save to Firebase (async)
+        (async () => {
+          try {
+            await setDoc(
+              doc(db, `conversations/${conversationId}/messages`, userMessage.id),
+              {
+                ...userMessage,
+                createdAt: new Date(userMessage.createdAt),
+              }
+            );
+          } catch (e) {
+            console.warn("Failed to save user message to Firebase", e);
+          }
+        })();
 
         return { messages: newMessages, isGenerating: true };
       });
