@@ -199,9 +199,8 @@ export const useChatStore = create<ChatState>((set, get) => {
         const newConversations = [conversation, ...state.conversations];
         const newMessages = new Map(state.messages).set(id, []);
 
-        // Save to localStorage
-        saveConversations(newConversations);
-        saveMessages(newMessages);
+        // Save to Firebase (async, don't wait)
+        saveConversationsToFirebase(newConversations);
 
         return {
           conversations: newConversations,
@@ -219,9 +218,14 @@ export const useChatStore = create<ChatState>((set, get) => {
         const newMessages = new Map(state.messages);
         newMessages.delete(id);
 
-        // Save to localStorage
-        saveConversations(newConversations);
-        saveMessages(newMessages);
+        // Delete from Firebase (async)
+        (async () => {
+          try {
+            await deleteDoc(doc(db, "conversations", id));
+          } catch (e) {
+            console.warn("Failed to delete conversation from Firebase", e);
+          }
+        })();
 
         return {
           conversations: newConversations,
@@ -240,8 +244,15 @@ export const useChatStore = create<ChatState>((set, get) => {
           c.id === id ? { ...c, title, updatedAt: Date.now() } : c,
         );
 
-        // Save to localStorage
-        saveConversations(newConversations);
+        // Update in Firebase (async)
+        (async () => {
+          try {
+            const convRef = doc(db, "conversations", id);
+            await updateDoc(convRef, { title, updatedAt: new Date() });
+          } catch (e) {
+            console.warn("Failed to rename conversation in Firebase", e);
+          }
+        })();
 
         return {
           conversations: newConversations,
