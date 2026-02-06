@@ -27,11 +27,65 @@ interface ChatState {
   toggleDarkMode: () => void;
   setShowMobileSidebar: (show: boolean) => void;
   setIsSearching: (searching: boolean) => void;
+  loadFromStorage: () => void;
 
   // Chat actions
   sendMessage: (conversationId: string, content: string) => Promise<void>;
   stopGenerating: () => void;
 }
+
+// Storage keys
+const STORAGE_KEY_CONVERSATIONS = "pinpin_conversations";
+const STORAGE_KEY_MESSAGES = "pinpin_messages";
+const STORAGE_KEY_DARK_MODE = "pinpin_dark_mode";
+
+// Utility functions for localStorage
+const saveConversations = (conversations: Conversation[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+  } catch (e) {
+    console.warn("Failed to save conversations to localStorage", e);
+  }
+};
+
+const saveMessages = (messages: Map<string, Message[]>) => {
+  try {
+    const messagesObj = Object.fromEntries(messages);
+    localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(messagesObj));
+  } catch (e) {
+    console.warn("Failed to save messages to localStorage", e);
+  }
+};
+
+const loadConversations = (): Conversation[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_CONVERSATIONS);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.warn("Failed to load conversations from localStorage", e);
+    return [];
+  }
+};
+
+const loadMessages = (): Map<string, Message[]> => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_MESSAGES);
+    const messagesObj = stored ? JSON.parse(stored) : {};
+    return new Map(Object.entries(messagesObj));
+  } catch (e) {
+    console.warn("Failed to load messages from localStorage", e);
+    return new Map();
+  }
+};
+
+const loadDarkMode = (): boolean => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_DARK_MODE);
+    return stored ? JSON.parse(stored) : true;
+  } catch {
+    return true;
+  }
+};
 
 // Use OpenRouter if configured on server, otherwise use mock
 const chatProvider = createOpenRouterChatProvider();
@@ -49,6 +103,25 @@ export const useChatStore = create<ChatState>((set, get) => {
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
+
+    // Load data from storage on init
+    loadFromStorage: () => {
+      const conversations = loadConversations();
+      const messages = loadMessages();
+      const darkMode = loadDarkMode();
+
+      set({
+        conversations,
+        messages,
+        darkMode,
+      });
+
+      if (darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    },
 
     // Actions
     createConversation: () => {
