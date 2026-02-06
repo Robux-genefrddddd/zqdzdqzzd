@@ -4,6 +4,20 @@ import {
   createMockChatProvider,
   createOpenRouterChatProvider,
 } from "@/providers/chatProvider";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface ChatState {
   // Data
@@ -17,6 +31,7 @@ interface ChatState {
   searchQuery: string;
   darkMode: boolean;
   showMobileSidebar: boolean;
+  isLoadingFromFirebase: boolean;
 
   // Actions
   createConversation: () => string;
@@ -27,64 +42,90 @@ interface ChatState {
   toggleDarkMode: () => void;
   setShowMobileSidebar: (show: boolean) => void;
   setIsSearching: (searching: boolean) => void;
-  loadFromStorage: () => void;
+  loadFromFirebase: () => Promise<void>;
 
   // Chat actions
   sendMessage: (conversationId: string, content: string) => Promise<void>;
   stopGenerating: () => void;
 }
 
-// Storage keys
-const STORAGE_KEY_CONVERSATIONS = "pinpin_conversations";
-const STORAGE_KEY_MESSAGES = "pinpin_messages";
-const STORAGE_KEY_DARK_MODE = "pinpin_dark_mode";
-
-// Utility functions for localStorage
-const saveConversations = (conversations: Conversation[]) => {
+// Utility functions for Firestore persistence
+const saveConversationsToFirebase = async (conversations: Conversation[]) => {
   try {
-    localStorage.setItem(STORAGE_KEY_CONVERSATIONS, JSON.stringify(conversations));
+    for (const conv of conversations) {
+      await setDoc(doc(db, "conversations", conv.id), {
+        ...conv,
+        updatedAt: new Date(conv.updatedAt),
+        createdAt: new Date(conv.createdAt),
+      });
+    }
   } catch (e) {
-    console.warn("Failed to save conversations to localStorage", e);
+    console.warn("Failed to save conversations to Firebase", e);
   }
 };
 
-const saveMessages = (messages: Map<string, Message[]>) => {
+const saveMessagesToFirebase = async (messages: Map<string, Message[]>) => {
   try {
-    const messagesObj = Object.fromEntries(messages);
-    localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(messagesObj));
+    for (const [conversationId, msgs] of messages) {
+      for (const msg of msgs) {
+        await setDoc(doc(db, `conversations/${conversationId}/messages`, msg.id), {
+          ...msg,
+          createdAt: new Date(msg.createdAt),
+        });
+      }
+    }
   } catch (e) {
-    console.warn("Failed to save messages to localStorage", e);
+    console.warn("Failed to save messages to Firebase", e);
   }
 };
 
-const loadConversations = (): Conversation[] => {
+const loadConversationsFromFirebase = async (): Promise<Conversation[]> => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY_CONVERSATIONS);
-    return stored ? JSON.parse(stored) : [];
+    const q = query(collection(db, "conversations"), orderBy("updatedAt", "desc"));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toMillis?.() || Date.now(),
+      updatedAt: doc.data().updatedAt?.toMillis?.() || Date.now(),
+    })) as Conversation[];
   } catch (e) {
-    console.warn("Failed to load conversations from localStorage", e);
+    console.warn("Failed to load conversations from Firebase", e);
     return [];
   }
 };
 
-const loadMessages = (): Map<string, Message[]> => {
+const loadMessagesFromFirebase = async (
+  conversationId: string
+): Promise<Message[]> => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY_MESSAGES);
-    const messagesObj = stored ? JSON.parse(stored) : {};
-    return new Map(Object.entries(messagesObj));
+    const q = query(
+      collection(db, `conversations/${conversationId}/messages`),
+      orderBy("createdAt", "asc")
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toMillis?.() || Date.now(),
+    })) as Message[];
   } catch (e) {
-    console.warn("Failed to load messages from localStorage", e);
-    return new Map();
+    console.warn("Failed to load messages from Firebase", e);
+    return [];
   }
 };
 
-const loadDarkMode = (): boolean => {
+const loadAllMessagesFromFirebase = async (
+  conversations: Conversation[]
+): Promise<Map<string, Message[]>> => {
+  const messagesMap = new Map<string, Message[]>();
   try {
-    const stored = localStorage.getItem(STORAGE_KEY_DARK_MODE);
-    return stored ? JSON.parse(stored) : true;
-  } catch {
-    return true;
+    for (const conv of conversations) {
+      const messages = await loadMessagesFromFirebase(conv.id);
+      messagesMap.set(conv.id, messages);
+    }
+  } catch (e) {
+    console.warn("Failed to load all messages from Firebase", e);
   }
+  return messagesMap;
 };
 
 // Use OpenRouter if configured on server, otherwise use mock
