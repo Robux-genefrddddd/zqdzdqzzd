@@ -207,6 +207,14 @@ export const useChatStore = create<ChatState>((set, get) => {
         } else {
           document.documentElement.classList.remove("dark");
         }
+
+        // Save to localStorage
+        try {
+          localStorage.setItem(STORAGE_KEY_DARK_MODE, JSON.stringify(newDarkMode));
+        } catch (e) {
+          console.warn("Failed to save dark mode preference", e);
+        }
+
         return { darkMode: newDarkMode };
       });
     },
@@ -220,6 +228,13 @@ export const useChatStore = create<ChatState>((set, get) => {
     },
 
     sendMessage: async (conversationId: string, content: string) => {
+      // Validate message size (limit to 10MB to prevent crashes)
+      const maxMessageSize = 10 * 1024 * 1024; // 10MB
+      if (new Blob([content]).size > maxMessageSize) {
+        alert("Message trop volumineux. Limite: 10MB");
+        return;
+      }
+
       const state = get();
       if (!state.messages.has(conversationId)) {
         state.messages.set(conversationId, []);
@@ -240,6 +255,10 @@ export const useChatStore = create<ChatState>((set, get) => {
           ...((newMessages.get(conversationId) as Message[]) || []),
           userMessage,
         ]);
+
+        // Save to localStorage
+        saveMessages(newMessages);
+
         return { messages: newMessages, isGenerating: true };
       });
 
@@ -253,19 +272,28 @@ export const useChatStore = create<ChatState>((set, get) => {
         let assistantMessageCreated = false;
         let updateBuffer = "";
         let lastUpdateTime = Date.now();
+        let totalCharsStreamed = 0;
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
             break;
           }
 
-          // Buffer chunks for performance - batch updates
+          // Limit total message size to prevent browser crashes
+          totalCharsStreamed += chunk.chunk.length;
+          if (totalCharsStreamed > 100000) {
+            console.warn("Message exceeds maximum size limit");
+            break;
+          }
+
+          // Buffer chunks for performance - batch updates with larger buffer
           updateBuffer += chunk.chunk;
           const now = Date.now();
-          const shouldUpdate = now - lastUpdateTime > 150 || chunk.isComplete; // Update every 150ms max to avoid crash
+          // Update every 200ms or when buffer reaches 2000 chars or on completion
+          const shouldUpdate = now - lastUpdateTime > 200 || chunk.isComplete || updateBuffer.length >= 2000;
 
-          if (!shouldUpdate && updateBuffer.length < 1000) {
-            continue; // Skip update, buffer more chunks (up to 1000 chars)
+          if (!shouldUpdate) {
+            continue; // Skip update, buffer more chunks
           }
 
           const chunkToProcess = updateBuffer;
@@ -321,9 +349,17 @@ export const useChatStore = create<ChatState>((set, get) => {
             }
 
             newMessages.set(conversationId, updatedMessages);
+
+            // Save final message to localStorage
+            saveMessages(newMessages);
+
             return { messages: newMessages };
           });
         }
+
+        // Save to localStorage after streaming completes
+        const finalState = get();
+        saveMessages(finalState.messages);
 
         // Update conversation title if empty (first message)
         const conversations = get().conversations;
