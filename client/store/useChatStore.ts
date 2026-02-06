@@ -218,12 +218,12 @@ export const useChatStore = create<ChatState>((set, get) => {
         const newMessages = new Map(state.messages);
         newMessages.delete(id);
 
-        // Delete from Firebase (async)
+        // Delete from Firebase (async, silent failure)
         (async () => {
           try {
             await deleteDoc(doc(db, "conversations", id));
           } catch (e) {
-            console.warn("Failed to delete conversation from Firebase", e);
+            // Silently fail - work offline
           }
         })();
 
@@ -244,13 +244,13 @@ export const useChatStore = create<ChatState>((set, get) => {
           c.id === id ? { ...c, title, updatedAt: Date.now() } : c,
         );
 
-        // Update in Firebase (async)
+        // Update in Firebase (async, silent failure)
         (async () => {
           try {
             const convRef = doc(db, "conversations", id);
             await updateDoc(convRef, { title, updatedAt: new Date() });
           } catch (e) {
-            console.warn("Failed to rename conversation in Firebase", e);
+            // Silently fail - work offline
           }
         })();
 
