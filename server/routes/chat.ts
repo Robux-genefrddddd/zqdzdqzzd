@@ -1,10 +1,6 @@
 import { RequestHandler } from "express";
 import { OpenRouter } from "@openrouter/sdk";
 
-const openrouter = new OpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
-
 export const handleChat: RequestHandler = async (req, res) => {
   const { message } = req.body;
 
@@ -18,6 +14,11 @@ export const handleChat: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "OpenRouter API key not configured" });
     return;
   }
+
+  // Create OpenRouter instance with the API key at request time
+  const openrouter = new OpenRouter({
+    apiKey: apiKey,
+  });
 
   // Set up streaming response
   res.setHeader("Content-Type", "text/event-stream");
