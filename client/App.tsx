@@ -11,10 +11,6 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Initialize Firebase data immediately (synchronously trigger load)
-import { useChatStore } from "@/store/useChatStore";
-useChatStore.getState().loadFromFirebase();
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
