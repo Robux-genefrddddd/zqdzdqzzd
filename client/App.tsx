@@ -8,18 +8,22 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useChatStore } from "@/store/useChatStore";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const loadFromFirebase = useChatStore((s) => s.loadFromFirebase);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Load conversations and messages from Firebase on app initialization
-    loadFromFirebase();
-  }, [loadFromFirebase]);
+    // Load conversations and messages from Firebase only once on app initialization
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      loadFromFirebase();
+    }
+  }, []); // Empty dependency array - run only once
 
   return (
     <BrowserRouter>
