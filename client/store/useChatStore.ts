@@ -414,6 +414,27 @@ export const useChatStore = create<ChatState>((set, get) => {
             }
 
             newMessages.set(conversationId, updatedMessages);
+
+            // Save to Firebase (async)
+            if (assistantMessageCreated) {
+              const assistantMsg = updatedMessages[updatedMessages.length - 1];
+              if (assistantMsg) {
+                (async () => {
+                  try {
+                    await setDoc(
+                      doc(db, `conversations/${conversationId}/messages`, assistantMsg.id),
+                      {
+                        ...assistantMsg,
+                        createdAt: new Date(assistantMsg.createdAt),
+                      }
+                    );
+                  } catch (e) {
+                    console.warn("Failed to save assistant message to Firebase", e);
+                  }
+                })();
+              }
+            }
+
             return { messages: newMessages };
           });
         }
@@ -431,20 +452,28 @@ export const useChatStore = create<ChatState>((set, get) => {
                 ...lastMsg,
                 content: lastMsg.content + updateBuffer,
               };
+
+              // Save final message to Firebase
+              (async () => {
+                try {
+                  await setDoc(
+                    doc(db, `conversations/${conversationId}/messages`, lastMsg.id),
+                    {
+                      ...updatedMessages[updatedMessages.length - 1],
+                      createdAt: new Date(lastMsg.createdAt),
+                    }
+                  );
+                } catch (e) {
+                  console.warn("Failed to save final message to Firebase", e);
+                }
+              })();
             }
 
             newMessages.set(conversationId, updatedMessages);
 
-            // Save final message to localStorage
-            saveMessages(newMessages);
-
             return { messages: newMessages };
           });
         }
-
-        // Save to localStorage after streaming completes
-        const finalState = get();
-        saveMessages(finalState.messages);
 
         // Update conversation title if empty (first message)
         const conversations = get().conversations;
