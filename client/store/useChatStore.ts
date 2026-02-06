@@ -144,23 +144,44 @@ export const useChatStore = create<ChatState>((set, get) => {
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
+    isLoadingFromFirebase: true,
 
-    // Load data from storage on init
-    loadFromStorage: () => {
-      const conversations = loadConversations();
-      const messages = loadMessages();
-      const darkMode = loadDarkMode();
+    // Load data from Firebase
+    loadFromFirebase: async () => {
+      try {
+        set({ isLoadingFromFirebase: true });
 
-      set({
-        conversations,
-        messages,
-        darkMode,
-      });
+        // Load conversations
+        const conversations = await loadConversationsFromFirebase();
 
-      if (darkMode) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
+        // Load all messages for all conversations
+        const messages = await loadAllMessagesFromFirebase(conversations);
+
+        // Load dark mode from localStorage (local preference)
+        const darkMode = (() => {
+          try {
+            const stored = localStorage.getItem("pinpin_dark_mode");
+            return stored ? JSON.parse(stored) : true;
+          } catch {
+            return true;
+          }
+        })();
+
+        set({
+          conversations,
+          messages,
+          darkMode,
+          isLoadingFromFirebase: false,
+        });
+
+        if (darkMode) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {
+        console.error("Failed to load from Firebase", e);
+        set({ isLoadingFromFirebase: false });
       }
     },
 
