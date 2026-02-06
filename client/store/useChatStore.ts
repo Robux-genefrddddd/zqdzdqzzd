@@ -415,7 +415,7 @@ export const useChatStore = create<ChatState>((set, get) => {
 
             newMessages.set(conversationId, updatedMessages);
 
-            // Save to Firebase (async)
+            // Save to Firebase (async, silent failure - work offline)
             if (assistantMessageCreated) {
               const assistantMsg = updatedMessages[updatedMessages.length - 1];
               if (assistantMsg) {
@@ -429,7 +429,7 @@ export const useChatStore = create<ChatState>((set, get) => {
                       }
                     );
                   } catch (e) {
-                    console.warn("Failed to save assistant message to Firebase", e);
+                    // Silently fail - work offline
                   }
                 })();
               }
