@@ -10,6 +10,7 @@ export default function Index() {
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const darkMode = useChatStore((s) => s.darkMode);
+  const isLoadingFromFirebase = useChatStore((s) => s.isLoadingFromFirebase);
 
   const hasInitialized = useRef(false);
 
@@ -17,16 +18,22 @@ export default function Index() {
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
 
-  // Create first conversation on mount if none exist
+  // Create first conversation on mount if none exist (only after Firebase loads)
   useEffect(() => {
-    if (!hasInitialized.current && conversations.length === 0) {
+    if (
+      !hasInitialized.current &&
+      !isLoadingFromFirebase &&
+      conversations.length === 0
+    ) {
       hasInitialized.current = true;
       createConversation();
     }
-  }, []);
+  }, [isLoadingFromFirebase, conversations.length, createConversation]);
 
   return (
     <AppLayout>
