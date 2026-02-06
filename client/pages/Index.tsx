@@ -33,7 +33,7 @@ export default function Index() {
       hasInitialized.current = true;
       createConversation();
     }
-  }, [isLoadingFromFirebase, conversations.length, createConversation]);
+  }, [isLoadingFromFirebase]); // Only depend on loading state
 
   return (
     <AppLayout>
