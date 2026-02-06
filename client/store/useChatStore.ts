@@ -132,6 +132,7 @@ const loadAllMessagesFromFirebase = async (
 const chatProvider = createOpenRouterChatProvider();
 
 let currentAbortSignal: AbortSignal | null = null;
+let firebaseInitialized = false; // Guard to prevent multiple initializations
 
 export const useChatStore = create<ChatState>((set, get) => {
   return {
@@ -144,10 +145,16 @@ export const useChatStore = create<ChatState>((set, get) => {
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
-    isLoadingFromFirebase: true,
+    isLoadingFromFirebase: false, // Start as false, only true during initial load
 
     // Load data from Firebase
     loadFromFirebase: async () => {
+      // Guard against multiple initializations
+      if (firebaseInitialized) {
+        return;
+      }
+      firebaseInitialized = true;
+
       try {
         set({ isLoadingFromFirebase: true });
 
