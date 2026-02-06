@@ -155,7 +155,9 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
         message: errorMessage,
       });
     } else {
-      res.write(`data: ${JSON.stringify({ error: "Stream error: " + errorMessage })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({ error: "Stream error: " + errorMessage })}\n\n`,
+      );
       res.end();
     }
   }

@@ -68,10 +68,13 @@ const saveMessagesToFirebase = async (messages: Map<string, Message[]>) => {
   try {
     for (const [conversationId, msgs] of messages) {
       for (const msg of msgs) {
-        await setDoc(doc(db, `conversations/${conversationId}/messages`, msg.id), {
-          ...msg,
-          createdAt: new Date(msg.createdAt),
-        });
+        await setDoc(
+          doc(db, `conversations/${conversationId}/messages`, msg.id),
+          {
+            ...msg,
+            createdAt: new Date(msg.createdAt),
+          },
+        );
       }
     }
   } catch (e) {
@@ -81,7 +84,10 @@ const saveMessagesToFirebase = async (messages: Map<string, Message[]>) => {
 
 const loadConversationsFromFirebase = async (): Promise<Conversation[]> => {
   try {
-    const q = query(collection(db, "conversations"), orderBy("updatedAt", "desc"));
+    const q = query(
+      collection(db, "conversations"),
+      orderBy("updatedAt", "desc"),
+    );
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -95,12 +101,12 @@ const loadConversationsFromFirebase = async (): Promise<Conversation[]> => {
 };
 
 const loadMessagesFromFirebase = async (
-  conversationId: string
+  conversationId: string,
 ): Promise<Message[]> => {
   try {
     const q = query(
       collection(db, `conversations/${conversationId}/messages`),
-      orderBy("createdAt", "asc")
+      orderBy("createdAt", "asc"),
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({
@@ -114,7 +120,7 @@ const loadMessagesFromFirebase = async (
 };
 
 const loadAllMessagesFromFirebase = async (
-  conversations: Conversation[]
+  conversations: Conversation[],
 ): Promise<Map<string, Message[]>> => {
   const messagesMap = new Map<string, Message[]>();
   try {
@@ -334,11 +340,15 @@ export const useChatStore = create<ChatState>((set, get) => {
         (async () => {
           try {
             await setDoc(
-              doc(db, `conversations/${conversationId}/messages`, userMessage.id),
+              doc(
+                db,
+                `conversations/${conversationId}/messages`,
+                userMessage.id,
+              ),
               {
                 ...userMessage,
                 createdAt: new Date(userMessage.createdAt),
-              }
+              },
             );
           } catch (e) {
             // Silently fail - work offline
@@ -376,7 +386,10 @@ export const useChatStore = create<ChatState>((set, get) => {
           updateBuffer += chunk.chunk;
           const now = Date.now();
           // Update every 200ms or when buffer reaches 2000 chars or on completion
-          const shouldUpdate = now - lastUpdateTime > 200 || chunk.isComplete || updateBuffer.length >= 2000;
+          const shouldUpdate =
+            now - lastUpdateTime > 200 ||
+            chunk.isComplete ||
+            updateBuffer.length >= 2000;
 
           if (!shouldUpdate) {
             continue; // Skip update, buffer more chunks
@@ -423,11 +436,15 @@ export const useChatStore = create<ChatState>((set, get) => {
                 (async () => {
                   try {
                     await setDoc(
-                      doc(db, `conversations/${conversationId}/messages`, assistantMsg.id),
+                      doc(
+                        db,
+                        `conversations/${conversationId}/messages`,
+                        assistantMsg.id,
+                      ),
                       {
                         ...assistantMsg,
                         createdAt: new Date(assistantMsg.createdAt),
-                      }
+                      },
                     );
                   } catch (e) {
                     // Silently fail - work offline
@@ -458,11 +475,15 @@ export const useChatStore = create<ChatState>((set, get) => {
               (async () => {
                 try {
                   await setDoc(
-                    doc(db, `conversations/${conversationId}/messages`, lastMsg.id),
+                    doc(
+                      db,
+                      `conversations/${conversationId}/messages`,
+                      lastMsg.id,
+                    ),
                     {
                       ...updatedMessages[updatedMessages.length - 1],
                       createdAt: new Date(lastMsg.createdAt),
-                    }
+                    },
                   );
                 } catch (e) {
                   // Silently fail - work offline
