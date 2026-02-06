@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { OpenRouter } from "@openrouter/sdk";
+import OpenAI from "openai";
 
 export const handleChat: RequestHandler = async (req, res) => {
   const { message } = req.body;
@@ -15,8 +15,9 @@ export const handleChat: RequestHandler = async (req, res) => {
     return;
   }
 
-  // Create OpenRouter instance with the API key at request time
-  const openrouter = new OpenRouter({
+  // Create OpenAI client with OpenRouter base URL
+  const client = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
     apiKey: apiKey,
   });
 
