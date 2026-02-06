@@ -453,7 +453,7 @@ export const useChatStore = create<ChatState>((set, get) => {
                 content: lastMsg.content + updateBuffer,
               };
 
-              // Save final message to Firebase
+              // Save final message to Firebase (silent failure - work offline)
               (async () => {
                 try {
                   await setDoc(
@@ -464,7 +464,7 @@ export const useChatStore = create<ChatState>((set, get) => {
                     }
                   );
                 } catch (e) {
-                  console.warn("Failed to save final message to Firebase", e);
+                  // Silently fail - work offline
                 }
               })();
             }
