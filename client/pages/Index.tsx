@@ -10,7 +10,6 @@ export default function Index() {
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const darkMode = useChatStore((s) => s.darkMode);
-  const isLoadingFromFirebase = useChatStore((s) => s.isLoadingFromFirebase);
 
   const hasInitialized = useRef(false);
 
@@ -23,17 +22,13 @@ export default function Index() {
     }
   }, [darkMode]);
 
-  // Create first conversation on mount if none exist (only after Firebase loads)
+  // Create first conversation on mount if none exist
   useEffect(() => {
-    if (
-      !hasInitialized.current &&
-      !isLoadingFromFirebase &&
-      conversations.length === 0
-    ) {
+    if (!hasInitialized.current && conversations.length === 0) {
       hasInitialized.current = true;
       createConversation();
     }
-  }, [isLoadingFromFirebase]); // Only depend on loading state
+  }, [conversations.length]); // Depend only on conversation count
 
   return (
     <AppLayout>
