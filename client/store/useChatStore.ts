@@ -49,7 +49,7 @@ interface ChatState {
   stopGenerating: () => void;
 }
 
-// Utility functions for Firestore persistence
+// Utility functions for Firestore persistence (with silent failures for offline mode)
 const saveConversationsToFirebase = async (conversations: Conversation[]) => {
   try {
     for (const conv of conversations) {
@@ -60,7 +60,7 @@ const saveConversationsToFirebase = async (conversations: Conversation[]) => {
       });
     }
   } catch (e) {
-    console.warn("Failed to save conversations to Firebase", e);
+    // Silently fail - work offline, Firebase is optional
   }
 };
 
@@ -75,7 +75,7 @@ const saveMessagesToFirebase = async (messages: Map<string, Message[]>) => {
       }
     }
   } catch (e) {
-    console.warn("Failed to save messages to Firebase", e);
+    // Silently fail - work offline, Firebase is optional
   }
 };
 
@@ -89,7 +89,7 @@ const loadConversationsFromFirebase = async (): Promise<Conversation[]> => {
       updatedAt: doc.data().updatedAt?.toMillis?.() || Date.now(),
     })) as Conversation[];
   } catch (e) {
-    console.warn("Failed to load conversations from Firebase", e);
+    // Silently fail - work offline, Firebase is optional
     return [];
   }
 };
@@ -108,7 +108,7 @@ const loadMessagesFromFirebase = async (
       createdAt: doc.data().createdAt?.toMillis?.() || Date.now(),
     })) as Message[];
   } catch (e) {
-    console.warn("Failed to load messages from Firebase", e);
+    // Silently fail - work offline, Firebase is optional
     return [];
   }
 };
@@ -123,7 +123,7 @@ const loadAllMessagesFromFirebase = async (
       messagesMap.set(conv.id, messages);
     }
   } catch (e) {
-    console.warn("Failed to load all messages from Firebase", e);
+    // Silently fail - work offline, Firebase is optional
   }
   return messagesMap;
 };
