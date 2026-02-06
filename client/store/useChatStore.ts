@@ -147,10 +147,11 @@ export const useChatStore = create<ChatState>((set, get) => {
     isLoadingFromFirebase: false,
 
     // Load data from Firebase (manual call, not automatic)
+    // Works offline - Firebase is optional
     loadFromFirebase: async () => {
-      try {
-        set({ isLoadingFromFirebase: true });
+      set({ isLoadingFromFirebase: true });
 
+      try {
         // Load conversations
         const conversations = await loadConversationsFromFirebase();
 
@@ -180,7 +181,7 @@ export const useChatStore = create<ChatState>((set, get) => {
           document.documentElement.classList.remove("dark");
         }
       } catch (e) {
-        console.error("Failed to load from Firebase", e);
+        // Silently fail - continue with empty state, Firebase is optional
         set({ isLoadingFromFirebase: false });
       }
     },
