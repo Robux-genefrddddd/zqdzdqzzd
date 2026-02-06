@@ -281,9 +281,9 @@ export const useChatStore = create<ChatState>((set, get) => {
           document.documentElement.classList.remove("dark");
         }
 
-        // Save to localStorage
+        // Save dark mode preference to localStorage (client-side only)
         try {
-          localStorage.setItem(STORAGE_KEY_DARK_MODE, JSON.stringify(newDarkMode));
+          localStorage.setItem("pinpin_dark_mode", JSON.stringify(newDarkMode));
         } catch (e) {
           console.warn("Failed to save dark mode preference", e);
         }
