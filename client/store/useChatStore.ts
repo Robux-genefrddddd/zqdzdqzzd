@@ -4,6 +4,20 @@ import {
   createMockChatProvider,
   createOpenRouterChatProvider,
 } from "@/providers/chatProvider";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface ChatState {
   // Data
@@ -17,6 +31,7 @@ interface ChatState {
   searchQuery: string;
   darkMode: boolean;
   showMobileSidebar: boolean;
+  isLoadingFromFirebase: boolean;
 
   // Actions
   createConversation: () => string;
@@ -27,11 +42,97 @@ interface ChatState {
   toggleDarkMode: () => void;
   setShowMobileSidebar: (show: boolean) => void;
   setIsSearching: (searching: boolean) => void;
+  loadFromFirebase: () => Promise<void>;
 
   // Chat actions
   sendMessage: (conversationId: string, content: string) => Promise<void>;
   stopGenerating: () => void;
 }
+
+// Utility functions for Firestore persistence (with silent failures for offline mode)
+const saveConversationsToFirebase = async (conversations: Conversation[]) => {
+  try {
+    for (const conv of conversations) {
+      await setDoc(doc(db, "conversations", conv.id), {
+        ...conv,
+        updatedAt: new Date(conv.updatedAt),
+        createdAt: new Date(conv.createdAt),
+      });
+    }
+  } catch (e) {
+    // Silently fail - work offline, Firebase is optional
+  }
+};
+
+const saveMessagesToFirebase = async (messages: Map<string, Message[]>) => {
+  try {
+    for (const [conversationId, msgs] of messages) {
+      for (const msg of msgs) {
+        await setDoc(
+          doc(db, `conversations/${conversationId}/messages`, msg.id),
+          {
+            ...msg,
+            createdAt: new Date(msg.createdAt),
+          },
+        );
+      }
+    }
+  } catch (e) {
+    // Silently fail - work offline, Firebase is optional
+  }
+};
+
+const loadConversationsFromFirebase = async (): Promise<Conversation[]> => {
+  try {
+    const q = query(
+      collection(db, "conversations"),
+      orderBy("updatedAt", "desc"),
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toMillis?.() || Date.now(),
+      updatedAt: doc.data().updatedAt?.toMillis?.() || Date.now(),
+    })) as Conversation[];
+  } catch (e) {
+    // Silently fail - work offline, Firebase is optional
+    return [];
+  }
+};
+
+const loadMessagesFromFirebase = async (
+  conversationId: string,
+): Promise<Message[]> => {
+  try {
+    const q = query(
+      collection(db, `conversations/${conversationId}/messages`),
+      orderBy("createdAt", "asc"),
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toMillis?.() || Date.now(),
+    })) as Message[];
+  } catch (e) {
+    // Silently fail - work offline, Firebase is optional
+    return [];
+  }
+};
+
+const loadAllMessagesFromFirebase = async (
+  conversations: Conversation[],
+): Promise<Map<string, Message[]>> => {
+  const messagesMap = new Map<string, Message[]>();
+  try {
+    for (const conv of conversations) {
+      const messages = await loadMessagesFromFirebase(conv.id);
+      messagesMap.set(conv.id, messages);
+    }
+  } catch (e) {
+    // Silently fail - work offline, Firebase is optional
+  }
+  return messagesMap;
+};
 
 // Use OpenRouter if configured on server, otherwise use mock
 const chatProvider = createOpenRouterChatProvider();
@@ -49,6 +150,47 @@ export const useChatStore = create<ChatState>((set, get) => {
     searchQuery: "",
     darkMode: true,
     showMobileSidebar: false,
+    isLoadingFromFirebase: false,
+
+    // Load data from Firebase (manual call, not automatic)
+    // Works offline - Firebase is optional
+    loadFromFirebase: async () => {
+      set({ isLoadingFromFirebase: true });
+
+      try {
+        // Load conversations
+        const conversations = await loadConversationsFromFirebase();
+
+        // Load all messages for all conversations
+        const messages = await loadAllMessagesFromFirebase(conversations);
+
+        // Load dark mode from localStorage (local preference)
+        const darkMode = (() => {
+          try {
+            const stored = localStorage.getItem("pinpin_dark_mode");
+            return stored ? JSON.parse(stored) : true;
+          } catch {
+            return true;
+          }
+        })();
+
+        set({
+          conversations,
+          messages,
+          darkMode,
+          isLoadingFromFirebase: false,
+        });
+
+        if (darkMode) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {
+        // Silently fail - continue with empty state, Firebase is optional
+        set({ isLoadingFromFirebase: false });
+      }
+    },
 
     // Actions
     createConversation: () => {
@@ -60,11 +202,19 @@ export const useChatStore = create<ChatState>((set, get) => {
         updatedAt: Date.now(),
       };
 
-      set((state) => ({
-        conversations: [conversation, ...state.conversations],
-        selectedConversationId: id,
-        messages: new Map(state.messages).set(id, []),
-      }));
+      set((state) => {
+        const newConversations = [conversation, ...state.conversations];
+        const newMessages = new Map(state.messages).set(id, []);
+
+        // Save to Firebase (async, don't wait)
+        saveConversationsToFirebase(newConversations);
+
+        return {
+          conversations: newConversations,
+          selectedConversationId: id,
+          messages: newMessages,
+        };
+      });
 
       return id;
     },
@@ -74,6 +224,15 @@ export const useChatStore = create<ChatState>((set, get) => {
         const newConversations = state.conversations.filter((c) => c.id !== id);
         const newMessages = new Map(state.messages);
         newMessages.delete(id);
+
+        // Delete from Firebase (async, silent failure)
+        (async () => {
+          try {
+            await deleteDoc(doc(db, "conversations", id));
+          } catch (e) {
+            // Silently fail - work offline
+          }
+        })();
 
         return {
           conversations: newConversations,
@@ -87,11 +246,25 @@ export const useChatStore = create<ChatState>((set, get) => {
     },
 
     renameConversation: (id: string, title: string) => {
-      set((state) => ({
-        conversations: state.conversations.map((c) =>
+      set((state) => {
+        const newConversations = state.conversations.map((c) =>
           c.id === id ? { ...c, title, updatedAt: Date.now() } : c,
-        ),
-      }));
+        );
+
+        // Update in Firebase (async, silent failure)
+        (async () => {
+          try {
+            const convRef = doc(db, "conversations", id);
+            await updateDoc(convRef, { title, updatedAt: new Date() });
+          } catch (e) {
+            // Silently fail - work offline
+          }
+        })();
+
+        return {
+          conversations: newConversations,
+        };
+      });
     },
 
     selectConversation: (id: string) => {
@@ -114,6 +287,14 @@ export const useChatStore = create<ChatState>((set, get) => {
         } else {
           document.documentElement.classList.remove("dark");
         }
+
+        // Save dark mode preference to localStorage (client-side only)
+        try {
+          localStorage.setItem("pinpin_dark_mode", JSON.stringify(newDarkMode));
+        } catch (e) {
+          console.warn("Failed to save dark mode preference", e);
+        }
+
         return { darkMode: newDarkMode };
       });
     },
@@ -127,6 +308,13 @@ export const useChatStore = create<ChatState>((set, get) => {
     },
 
     sendMessage: async (conversationId: string, content: string) => {
+      // Validate message size (limit to 10MB to prevent crashes)
+      const maxMessageSize = 10 * 1024 * 1024; // 10MB
+      if (new Blob([content]).size > maxMessageSize) {
+        alert("Message trop volumineux. Limite: 10MB");
+        return;
+      }
+
       const state = get();
       if (!state.messages.has(conversationId)) {
         state.messages.set(conversationId, []);
@@ -147,6 +335,26 @@ export const useChatStore = create<ChatState>((set, get) => {
           ...((newMessages.get(conversationId) as Message[]) || []),
           userMessage,
         ]);
+
+        // Save to Firebase (async, silent failure - work offline)
+        (async () => {
+          try {
+            await setDoc(
+              doc(
+                db,
+                `conversations/${conversationId}/messages`,
+                userMessage.id,
+              ),
+              {
+                ...userMessage,
+                createdAt: new Date(userMessage.createdAt),
+              },
+            );
+          } catch (e) {
+            // Silently fail - work offline
+          }
+        })();
+
         return { messages: newMessages, isGenerating: true };
       });
 
@@ -160,19 +368,31 @@ export const useChatStore = create<ChatState>((set, get) => {
         let assistantMessageCreated = false;
         let updateBuffer = "";
         let lastUpdateTime = Date.now();
+        let totalCharsStreamed = 0;
 
         for await (const chunk of generator) {
           if (currentAbortSignal?.aborted) {
             break;
           }
 
-          // Buffer chunks for performance - batch updates
+          // Limit total message size to prevent browser crashes
+          totalCharsStreamed += chunk.chunk.length;
+          if (totalCharsStreamed > 100000) {
+            console.warn("Message exceeds maximum size limit");
+            break;
+          }
+
+          // Buffer chunks for performance - batch updates with larger buffer
           updateBuffer += chunk.chunk;
           const now = Date.now();
-          const shouldUpdate = now - lastUpdateTime > 150 || chunk.isComplete; // Update every 150ms max to avoid crash
+          // Update every 200ms or when buffer reaches 2000 chars or on completion
+          const shouldUpdate =
+            now - lastUpdateTime > 200 ||
+            chunk.isComplete ||
+            updateBuffer.length >= 2000;
 
-          if (!shouldUpdate && updateBuffer.length < 1000) {
-            continue; // Skip update, buffer more chunks (up to 1000 chars)
+          if (!shouldUpdate) {
+            continue; // Skip update, buffer more chunks
           }
 
           const chunkToProcess = updateBuffer;
@@ -208,6 +428,31 @@ export const useChatStore = create<ChatState>((set, get) => {
             }
 
             newMessages.set(conversationId, updatedMessages);
+
+            // Save to Firebase (async, silent failure - work offline)
+            if (assistantMessageCreated) {
+              const assistantMsg = updatedMessages[updatedMessages.length - 1];
+              if (assistantMsg) {
+                (async () => {
+                  try {
+                    await setDoc(
+                      doc(
+                        db,
+                        `conversations/${conversationId}/messages`,
+                        assistantMsg.id,
+                      ),
+                      {
+                        ...assistantMsg,
+                        createdAt: new Date(assistantMsg.createdAt),
+                      },
+                    );
+                  } catch (e) {
+                    // Silently fail - work offline
+                  }
+                })();
+              }
+            }
+
             return { messages: newMessages };
           });
         }
@@ -225,9 +470,29 @@ export const useChatStore = create<ChatState>((set, get) => {
                 ...lastMsg,
                 content: lastMsg.content + updateBuffer,
               };
+
+              // Save final message to Firebase (silent failure - work offline)
+              (async () => {
+                try {
+                  await setDoc(
+                    doc(
+                      db,
+                      `conversations/${conversationId}/messages`,
+                      lastMsg.id,
+                    ),
+                    {
+                      ...updatedMessages[updatedMessages.length - 1],
+                      createdAt: new Date(lastMsg.createdAt),
+                    },
+                  );
+                } catch (e) {
+                  // Silently fail - work offline
+                }
+              })();
             }
 
             newMessages.set(conversationId, updatedMessages);
+
             return { messages: newMessages };
           });
         }

@@ -1,9 +1,5 @@
 import { RequestHandler } from "express";
-import { OpenRouter } from "@openrouter/sdk";
-
-const openrouter = new OpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
+import OpenAI from "openai";
 
 export const handleChat: RequestHandler = async (req, res) => {
   const { message } = req.body;
@@ -19,6 +15,12 @@ export const handleChat: RequestHandler = async (req, res) => {
     return;
   }
 
+  // Create OpenAI client with OpenRouter base URL
+  const client = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: apiKey,
+  });
+
   // Set up streaming response
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -26,8 +28,8 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    // Stream the response to get reasoning tokens in usage
-    const stream = await openrouter.chat.send({
+    // Stream the response from OpenRouter via OpenAI client
+    const stream = await client.chat.completions.create({
       model: "arcee-ai/trinity-large-preview:free",
       messages: [
         {
@@ -126,17 +128,10 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
       stream: true,
     });
 
-    let response = "";
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
-        response += content;
         res.write(`data: ${JSON.stringify({ chunk: content })}\n\n`);
-      }
-
-      // Usage information comes in the final chunk
-      if (chunk.usage) {
-        console.log("Reasoning tokens:", (chunk.usage as any).reasoningTokens);
       }
     }
 
@@ -146,6 +141,13 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
   } catch (error) {
     console.error("Chat handler error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+
+    console.error("Error details:", {
+      message: errorMessage,
+      stack: errorStack,
+      fullError: error,
+    });
 
     if (!res.headersSent) {
       res.status(500).json({
@@ -153,7 +155,9 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
         message: errorMessage,
       });
     } else {
-      res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({ error: "Stream error: " + errorMessage })}\n\n`,
+      );
       res.end();
     }
   }

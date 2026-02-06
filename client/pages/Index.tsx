@@ -5,25 +5,27 @@ import { MessageList } from "@/components/chat/MessageList";
 import { Composer } from "@/components/chat/Composer";
 import { useEffect, useRef } from "react";
 
+const initRef = { done: false };
+
 export default function Index() {
   const selectedConversationId = useChatStore((s) => s.selectedConversationId);
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const darkMode = useChatStore((s) => s.darkMode);
 
-  const hasInitialized = useRef(false);
-
   // Initialize app theme
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
 
-  // Create first conversation on mount if none exist
+  // Create first conversation on mount ONLY ONCE if none exist
   useEffect(() => {
-    if (!hasInitialized.current && conversations.length === 0) {
-      hasInitialized.current = true;
+    if (!initRef.done && conversations.length === 0) {
+      initRef.done = true;
       createConversation();
     }
   }, []);
