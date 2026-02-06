@@ -26,6 +26,14 @@ export const handleChat: RequestHandler = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
+    // Verify API key is loaded
+    if (!process.env.OPENROUTER_API_KEY) {
+      res.status(500).json({ error: "OpenRouter API key not configured" });
+      return;
+    }
+
+    console.log("Sending message to OpenRouter...");
+
     // Stream the response to get reasoning tokens in usage
     const stream = await openrouter.chat.send({
       model: "arcee-ai/trinity-large-preview:free",
@@ -146,6 +154,13 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
   } catch (error) {
     console.error("Chat handler error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+
+    console.error("Error details:", {
+      message: errorMessage,
+      stack: errorStack,
+      fullError: error,
+    });
 
     if (!res.headersSent) {
       res.status(500).json({
@@ -153,7 +168,7 @@ Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimis√
         message: errorMessage,
       });
     } else {
-      res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);
+      res.write(`data: ${JSON.stringify({ error: "Stream error: " + errorMessage })}\n\n`);
       res.end();
     }
   }
