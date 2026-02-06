@@ -28,12 +28,13 @@ export const handleChat: RequestHandler = async (req, res) => {
 
   try {
     // Stream the response to get reasoning tokens in usage
-    const stream = await openrouter.chat.send({
-      model: "arcee-ai/trinity-large-preview:free",
-      messages: [
-        {
-          role: "system",
-          content: `Tu es **PinPin-IA 5.1**, une IA spécialisée en programmation Roblox et Lua.
+    const stream = await openrouter.chat.stream(
+      {
+        model: "arcee-ai/trinity-large-preview:free",
+        messages: [
+          {
+            role: "system",
+            content: `Tu es **PinPin-IA 5.1**, une IA spécialisée en programmation Roblox et Lua.
 
 STYLE DE COMMUNICATION:
 - Reste professionnel et concis
@@ -118,14 +119,14 @@ PAS DE:
 ✗ Code désoptimisé
 
 Utilise TES CONNAISSANCES ROBLOX pour donner du code fiable, complet et optimisé.`,
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-      stream: true,
-    });
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+      }
+    );
 
     let response = "";
     for await (const chunk of stream) {
